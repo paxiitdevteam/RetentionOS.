@@ -50,9 +50,10 @@ retentionos/
 ### Prerequisites
 
 - Node.js 20+ 
-- PostgreSQL 15+
+- MariaDB 10.5+ or MySQL 8.0+ (on NAS)
 - Redis 7+
 - Docker & Docker Compose (optional)
+- Git Bash (Windows) or Bash (Linux/macOS)
 
 ### Installation
 
@@ -105,7 +106,7 @@ docker-compose up
 **Backend:**
 - Node.js + Express
 - TypeScript
-- PostgreSQL + Sequelize
+- MariaDB/MySQL + Sequelize (multiplatform)
 - Redis
 - JWT Authentication
 - Stripe Integration

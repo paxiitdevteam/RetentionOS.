@@ -12,19 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     
     services:
-      postgres:
-        image: postgres:15-alpine
+      mariadb:
+        image: mariadb:10.11
         env:
-          POSTGRES_USER: retentionos
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: retentionos_test
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_USER: retentionos
+          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: retentionos_test
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "mysqladmin ping -h localhost"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 3306:3306
       
       redis:
         image: redis:7-alpine
@@ -57,7 +58,12 @@ jobs:
       - name: Run tests
         working-directory: ./backend
         env:
-          DATABASE_URL: postgresql://retentionos:password@localhost:5432/retentionos_test
+          DATABASE_URL: mysql://retentionos:password@localhost:3306/retentionos_test
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_NAME: retentionos_test
+          DB_USER: retentionos
+          DB_PASSWORD: password
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
         run: npm test || true

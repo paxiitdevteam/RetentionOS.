@@ -54,9 +54,9 @@ AdminAccount.init(
       field: 'password_hash',
     },
     role: {
-      type: DataTypes.ENUM(...Object.values(AdminRole)),
+      type: DataTypes.ENUM('owner', 'admin', 'analyst', 'readonly'),
       allowNull: false,
-      defaultValue: AdminRole.READONLY,
+      defaultValue: 'readonly',
     },
     createdAt: {
       type: DataTypes.DATE,

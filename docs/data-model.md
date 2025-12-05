@@ -25,7 +25,7 @@
 ### flows
 - id (PK)
 - name
-- steps (JSONB)
+- steps (JSON)
 - ranking_score
 - language
 - created_at
@@ -51,6 +51,7 @@
 - id (PK)
 - email
 - password_hash
+- role (ENUM: owner, admin, analyst, readonly)
 - created_at
 - updated_at
 
@@ -65,5 +66,10 @@
 - id (PK)
 - admin_id (FK)
 - action
+- ip
+- description
+- resource_id
+- before_state (JSON)
+- after_state (JSON)
 - created_at
 

@@ -62,6 +62,10 @@ Subscription.init(
     value: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
+      get() {
+        const value = this.getDataValue('value');
+        return value ? parseFloat(value.toString()) : null;
+      },
     },
     status: {
       type: DataTypes.STRING(50),

@@ -8,7 +8,7 @@ RetentionOS is a universal retention engine for SaaS founders. The platform inte
 
 ### Backend API
 - Express.js server
-- PostgreSQL database
+- MariaDB/MySQL database (multiplatform)
 - Redis for caching
 - JWT authentication
 - Stripe webhook integration
@@ -38,7 +38,7 @@ RetentionOS is a universal retention engine for SaaS founders. The platform inte
 
 ## Technology Stack
 
-- **Backend**: Node.js, Express, TypeScript, PostgreSQL, Sequelize
+- **Backend**: Node.js, Express, TypeScript, MariaDB/MySQL, Sequelize
 - **Frontend Dashboard**: Next.js, React, TypeScript, TailwindCSS
 - **Widget**: Vanilla JavaScript, Webpack
 - **Infrastructure**: Docker, Docker Compose, Nginx

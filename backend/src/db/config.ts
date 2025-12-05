@@ -1,14 +1,15 @@
 /**
  * Database Configuration
  * Sequelize configuration for RetentionOS
+ * Uses MariaDB/MySQL (multiplatform compatible)
  */
 
 import { SequelizeOptions } from 'sequelize-typescript';
 
 export const dbConfig: SequelizeOptions = {
-  dialect: 'postgres',
+  dialect: 'mysql',
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
+  port: parseInt(process.env.DB_PORT || '3306'),
   database: process.env.DB_NAME || 'retentionos',
   username: process.env.DB_USER || 'retentionos',
   password: process.env.DB_PASSWORD || 'password',
@@ -23,6 +24,10 @@ export const dbConfig: SequelizeOptions = {
     timestamps: true,
     underscored: false,
     freezeTableName: true,
+  },
+  dialectOptions: {
+    // Enable for MariaDB/MySQL compatibility
+    timezone: 'local',
   },
 };
 

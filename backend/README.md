@@ -6,8 +6,9 @@ Node.js/Express backend API for RetentionOS.
 
 ### Prerequisites
 - Node.js 20+
-- PostgreSQL 15+
+- MariaDB 10.5+ or MySQL 8.0+ (on NAS)
 - Redis 7+
+- Git Bash (Windows) or Bash (Linux/macOS)
 
 ### Installation
 
@@ -50,7 +51,7 @@ npm run dev
 
 ## Database
 
-The backend uses PostgreSQL with Sequelize ORM.
+The backend uses MariaDB/MySQL with Sequelize ORM (multiplatform compatible).
 
 ### Models
 - User

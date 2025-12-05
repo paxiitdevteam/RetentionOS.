@@ -76,6 +76,10 @@ OfferEvent.init(
       allowNull: false,
       defaultValue: 0,
       field: 'revenue_saved',
+      get() {
+        const value = this.getDataValue('revenueSaved');
+        return value ? parseFloat(value.toString()) : 0;
+      },
     },
     createdAt: {
       type: DataTypes.DATE,

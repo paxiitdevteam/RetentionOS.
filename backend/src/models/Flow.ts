@@ -43,7 +43,7 @@ Flow.init(
       allowNull: false,
     },
     steps: {
-      type: DataTypes.JSONB,
+      type: DataTypes.JSON,
       allowNull: false,
     },
     rankingScore: {

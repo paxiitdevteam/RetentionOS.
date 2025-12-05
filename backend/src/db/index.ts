@@ -13,7 +13,7 @@ export const sequelize = new Sequelize(
   dbConfig.password!,
   {
     ...dbConfig,
-    dialect: 'postgres',
+    dialect: 'mysql',
   }
 );
 

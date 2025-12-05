@@ -73,12 +73,12 @@ AuditLog.init(
       field: 'resource_id',
     },
     beforeState: {
-      type: DataTypes.JSONB,
+      type: DataTypes.JSON,
       allowNull: true,
       field: 'before_state',
     },
     afterState: {
-      type: DataTypes.JSONB,
+      type: DataTypes.JSON,
       allowNull: true,
       field: 'after_state',
     },
