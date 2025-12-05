@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS admin_accounts (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
+  role VARCHAR(20) DEFAULT 'readonly' CHECK (role IN ('owner', 'admin', 'analyst', 'readonly')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -64,13 +65,19 @@ CREATE TABLE IF NOT EXISTS api_keys (
   key VARCHAR(255) UNIQUE NOT NULL,
   owner_id INT REFERENCES admin_accounts(id) ON DELETE CASCADE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  last_used TIMESTAMP
+  last_used TIMESTAMP,
+  expires_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS audit_logs (
   id SERIAL PRIMARY KEY,
   admin_id INT REFERENCES admin_accounts(id) ON DELETE SET NULL,
-  action TEXT,
+  action TEXT NOT NULL,
+  ip VARCHAR(45),
+  description TEXT,
+  resource_id INT,
+  before_state JSONB,
+  after_state JSONB,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -84,4 +91,9 @@ CREATE INDEX IF NOT EXISTS idx_offer_events_created_at ON offer_events(created_a
 CREATE INDEX IF NOT EXISTS idx_churn_reasons_user_id ON churn_reasons(user_id);
 CREATE INDEX IF NOT EXISTS idx_api_keys_key ON api_keys(key);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_admin_id ON audit_logs(admin_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_resource_id ON audit_logs(resource_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_expires_at ON api_keys(expires_at);
+CREATE INDEX IF NOT EXISTS idx_admin_accounts_role ON admin_accounts(role);
 
