@@ -750,6 +750,40 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  // ROI Methods
+  async getROIMetrics(monthlyCost?: number, days?: number) {
+    const params = new URLSearchParams();
+    if (monthlyCost !== undefined) params.append('monthlyCost', monthlyCost.toString());
+    if (days !== undefined) params.append('days', days.toString());
+    const query = params.toString();
+    return this.request<{ success: boolean; metrics: any }>(
+      PMS.getApiPath(`/admin/roi${query ? `?${query}` : ''}`),
+      { method: 'GET' }
+    );
+  }
+
+  async getROITrend(monthlyCost?: number, days?: number) {
+    const params = new URLSearchParams();
+    if (monthlyCost !== undefined) params.append('monthlyCost', monthlyCost.toString());
+    if (days !== undefined) params.append('days', days.toString());
+    const query = params.toString();
+    return this.request<{ success: boolean; trend: any[] }>(
+      PMS.getApiPath(`/admin/roi/trend${query ? `?${query}` : ''}`),
+      { method: 'GET' }
+    );
+  }
+
+  async getRevenueForecast(monthlyCost?: number, days?: number) {
+    const params = new URLSearchParams();
+    if (monthlyCost !== undefined) params.append('monthlyCost', monthlyCost.toString());
+    if (days !== undefined) params.append('days', days.toString());
+    const query = params.toString();
+    return this.request<{ success: boolean; forecast: any }>(
+      PMS.getApiPath(`/admin/roi/forecast${query ? `?${query}` : ''}`),
+      { method: 'GET' }
+    );
+  }
 }
 
 // Export singleton instance
