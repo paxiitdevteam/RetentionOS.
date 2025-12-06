@@ -6,8 +6,8 @@ services:
   # Backend API Service
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile-backend
     container_name: retentionos-backend
     restart: unless-stopped
     ports:
@@ -31,15 +31,15 @@ services:
       - CORS_ORIGIN=*
     volumes:
       # Mount source code for hot reload in development
-      - ./backend/src:/app/src
-      - ./backend/package.json:/app/package.json
-      - ./backend/tsconfig.json:/app/tsconfig.json
+      - ./src-backend:/app/src-backend
+      - ./package-backend.json:/app/package.json
+      - ./tsconfig-backend.json:/app/tsconfig.json
       # Use named volume for node_modules to persist dependencies
       # Dependencies are installed in Dockerfile, so this volume will have them
       - backend_node_modules:/app/node_modules
       - backend_logs:/app/logs
     # Override CMD for development (use ts-node-dev for hot reload)
-    command: npm run dev
+    command: ts-node-dev --respawn --transpile-only src-backend/server.ts
     depends_on:
       db:
         condition: service_healthy
@@ -57,7 +57,7 @@ services:
   # Dashboard Frontend Service
   dashboard:
     build:
-      context: ./frontend/dashboard
+      context: ./dashboard
       dockerfile: Dockerfile
     container_name: retentionos-dashboard
     restart: unless-stopped
@@ -69,12 +69,12 @@ services:
       - NEXT_PUBLIC_API_URL=http://localhost:3000
     volumes:
       # Mount source code for hot reload
-      - ./frontend/dashboard/src:/app/src
-      - ./frontend/dashboard/public:/app/public
-      - ./frontend/dashboard/package.json:/app/package.json
-      - ./frontend/dashboard/next.config.js:/app/next.config.js
-      - ./frontend/dashboard/tailwind.config.js:/app/tailwind.config.js
-      - ./frontend/dashboard/tsconfig.json:/app/tsconfig.json
+      - ./dashboard/src:/app/src
+      - ./dashboard/public:/app/public
+      - ./dashboard/package.json:/app/package.json
+      - ./dashboard/next.config.js:/app/next.config.js
+      - ./dashboard/tailwind.config.js:/app/tailwind.config.js
+      - ./dashboard/tsconfig.json:/app/tsconfig.json
       - dashboard_node_modules:/app/node_modules
       - dashboard_next:/app/.next
     depends_on:
@@ -131,7 +131,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       # Auto-run migrations on first start
-      - ./backend/src/migrations:/docker-entrypoint-initdb.d:ro
+      - ./src-backend/migrations:/docker-entrypoint-initdb.d:ro
     command: >
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
