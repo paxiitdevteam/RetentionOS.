@@ -85,7 +85,19 @@ const initPMSLinks = () => {
     }
     
     // Update all dashboard links by ID
-    const dashboardLinkIds = ['loginLink', 'getStartedLink', 'heroTrialLink', 'ctaTrialLink', 'footerDashboardLink', 'pricingStarterBtn', 'pricingProBtn'];
+    const dashboardLinkIds = [
+        'loginLink', 
+        'getStartedLink', 
+        'heroTrialLink', 
+        'ctaTrialLink', 
+        'footerDashboardLink', 
+        'pricingStarterBtn', 
+        'pricingProBtn',
+        'pricingFreeBtn',
+        'pricingGrowthBtn',
+        'pricingScaleBtn',
+        'exploreDashboardLink'
+    ];
     dashboardLinkIds.forEach(id => {
         const link = document.getElementById(id);
         if (link) {
@@ -101,10 +113,25 @@ const initPMSLinks = () => {
         }
     });
     
+    // Update "Explore Dashboard" link (goes to dashboard home, not login)
+    const exploreDashboardLink = document.getElementById('exploreDashboardLink');
+    if (exploreDashboardLink) {
+        const dashboardUrl = PMS.getDashboardUrl('/');
+        exploreDashboardLink.href = dashboardUrl;
+        exploreDashboardLink.onclick = null;
+        exploreDashboardLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = dashboardUrl;
+        });
+    }
+    
     // Update any remaining dashboard links with IDs (fallback)
     document.querySelectorAll('a[href="#"]').forEach(link => {
         const id = link.getAttribute('id');
         if (id && (id.includes('login') || id.includes('dashboard') || id.includes('trial') || id.includes('started') || id.includes('pricing'))) {
+            // Skip exploreDashboardLink as it's handled above
+            if (id === 'exploreDashboardLink') return;
+            
             const dashboardUrl = PMS.getDashboardUrl('/login');
             link.href = dashboardUrl;
             link.onclick = null; // Remove any existing onclick

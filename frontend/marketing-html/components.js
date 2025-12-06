@@ -120,10 +120,12 @@ class ComponentLoader {
         }
 
         // Update all dashboard links
-        const dashboardLinks = document.querySelectorAll('#loginLink, #getStartedLink, #heroTrialLink, #ctaTrialLink, #footerDashboardLink, #pricingStarterBtn, #pricingProBtn');
+        const dashboardLinks = document.querySelectorAll('#loginLink, #getStartedLink, #heroTrialLink, #ctaTrialLink, #footerDashboardLink, #pricingStarterBtn, #pricingProBtn, #pricingFreeBtn, #pricingGrowthBtn, #pricingScaleBtn, #exploreDashboardLink');
         dashboardLinks.forEach(link => {
             if (link) {
-                link.href = PMS.getDashboardUrl('/login');
+                // Explore Dashboard goes to dashboard home, others go to login
+                const path = link.id === 'exploreDashboardLink' ? '/' : '/login';
+                link.href = PMS.getDashboardUrl(path);
             }
         });
     }
