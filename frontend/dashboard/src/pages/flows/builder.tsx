@@ -111,7 +111,11 @@ const FlowBuilder: NextPage = () => {
         // Update existing flow
         const response = await apiClient.updateFlowFull(flow.id, flow);
         setFlow({ ...flow, ...response.flow });
-        alert('Flow saved successfully!');
+        setShowMessageModal({
+          type: 'success',
+          title: 'Success',
+          message: 'Flow saved successfully!',
+        });
       } else {
         // Create new flow
         const response = await apiClient.createFlow(flow);
@@ -119,7 +123,11 @@ const FlowBuilder: NextPage = () => {
         return;
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to save flow');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to save flow',
+      });
     } finally {
       setSaving(false);
     }
@@ -127,15 +135,27 @@ const FlowBuilder: NextPage = () => {
 
   const handleActivate = async () => {
     if (!flow.id) {
-      alert('Please save the flow first');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: 'Please save the flow first',
+      });
       return;
     }
     try {
       await apiClient.activateFlow(flow.id);
-      alert('Flow activated!');
+      setShowMessageModal({
+        type: 'success',
+        title: 'Success',
+        message: 'Flow activated!',
+      });
       await loadFlow(flow.id);
     } catch (err: any) {
-      alert(err.message || 'Failed to activate flow');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to activate flow',
+      });
     }
   };
 
@@ -145,17 +165,30 @@ const FlowBuilder: NextPage = () => {
     }
     try {
       await apiClient.deactivateFlow(flow.id);
-      alert('Flow deactivated!');
+      setShowMessageModal({
+        type: 'success',
+        title: 'Success',
+        message: 'Flow deactivated!',
+      });
       await loadFlow(flow.id);
     } catch (err: any) {
-      alert(err.message || 'Failed to deactivate flow');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to deactivate flow',
+      });
     }
   };
 
   const handleLoadTemplate = async (template: Flow) => {
-    if (!confirm('Load this template? This will replace your current flow.')) return;
-    setFlow(template);
-    setSelectedStepIndex(template.steps.length > 0 ? 0 : null);
+    setShowConfirmModal({
+      message: 'Load this template? This will replace your current flow.',
+      onConfirm: () => {
+        setFlow(template);
+        setSelectedStepIndex(template.steps.length > 0 ? 0 : null);
+        setShowConfirmModal(null);
+      },
+    });
   };
 
   const handleAddStep = (type: FlowStep['type']) => {

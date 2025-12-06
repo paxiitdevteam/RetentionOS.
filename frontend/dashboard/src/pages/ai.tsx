@@ -107,11 +107,19 @@ const AIPage: NextPage = () => {
       setProcessing(true);
       const result = await apiClient.processPendingAlertsWithAI();
       if (result.success) {
-        alert(`✅ Processed ${result.processed} alerts (${result.successful} successful, ${result.failed} failed)`);
+        setShowMessageModal({
+          type: 'success',
+          title: 'Success',
+          message: `Processed ${result.processed} alerts (${result.successful} successful, ${result.failed} failed)`,
+        });
         loadData();
       }
     } catch (err: any) {
-      alert(`❌ Error: ${err.message || 'Failed to process alerts'}`);
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to process alerts',
+      });
     } finally {
       setProcessing(false);
     }

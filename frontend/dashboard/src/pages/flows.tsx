@@ -183,15 +183,7 @@ const Flows: NextPage = () => {
                         </Button>
                         <Button
                           size="sm"
-                          onClick={async () => {
-                            try {
-                              const newName = prompt('Enter name for duplicate (or leave blank for default):');
-                              await apiClient.duplicateFlow(flow.id, newName || undefined);
-                              await loadFlows();
-                            } catch (err: any) {
-                              alert(err.message || 'Failed to duplicate flow');
-                            }
-                          }}
+                          onClick={() => handleDuplicate(flow.id, flow.name)}
                         >
                           Duplicate
                         </Button>
