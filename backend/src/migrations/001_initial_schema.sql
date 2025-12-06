@@ -86,13 +86,13 @@ CREATE TABLE IF NOT EXISTS admin_accounts (
 
 CREATE TABLE IF NOT EXISTS api_keys (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  key VARCHAR(255) UNIQUE NOT NULL,
+  `key` VARCHAR(255) UNIQUE NOT NULL,
   owner_id INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_used TIMESTAMP NULL,
   expires_at TIMESTAMP NULL,
   FOREIGN KEY (owner_id) REFERENCES admin_accounts(id) ON DELETE CASCADE,
-  INDEX idx_api_keys_key (key),
+  INDEX idx_api_keys_key (`key`),
   INDEX idx_api_keys_owner_id (owner_id),
   INDEX idx_api_keys_expires_at (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
