@@ -7,7 +7,7 @@ import { Op } from 'sequelize';
 import Alert from '../models/Alert';
 import Subscription from '../models/Subscription';
 import User from '../models/User';
-import { processAlertWithAI } from './AIAgentService';
+// Import AIAgentService dynamically to avoid circular dependency
 
 export type AlertType =
   | 'renewal_reminder'
@@ -72,8 +72,13 @@ export async function createAlert(input: CreateAlertInput, useAI: boolean = true
         };
 
         // Process with AI agent (async, don't wait)
-        processAlertWithAI(context).catch((error) => {
-          console.error('Error processing alert with AI:', error);
+        // Import dynamically to avoid circular dependency
+        import('./AIAgentService').then(({ processAlertWithAI }) => {
+          processAlertWithAI(context).catch((error) => {
+            console.error('Error processing alert with AI:', error);
+          });
+        }).catch((error) => {
+          console.error('Error loading AIAgentService:', error);
         });
       }
     } catch (error) {
