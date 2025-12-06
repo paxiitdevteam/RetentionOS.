@@ -71,7 +71,11 @@ const Settings: NextPage = () => {
         await loadApiKeys();
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to create API key');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to create API key',
+      });
     }
   };
 

@@ -410,6 +410,17 @@ const Subscriptions: NextPage = () => {
             )}
           </>
         )}
+
+        {/* Message Modal */}
+        {showMessageModal && (
+          <MessageModal
+            isOpen={!!showMessageModal}
+            onClose={() => setShowMessageModal(null)}
+            type={showMessageModal.type}
+            title={showMessageModal.title}
+            message={showMessageModal.message}
+          />
+        )}
       </div>
     </Layout>
   );
