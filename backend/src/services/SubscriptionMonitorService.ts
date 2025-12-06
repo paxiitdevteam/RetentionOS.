@@ -48,6 +48,7 @@ export async function getUpcomingSubscriptions(days: number = 30): Promise<Upcom
       status: 'active',
       endDate: {
         [Op.between]: [new Date(), endDate],
+        [Op.ne]: null, // Exclude subscriptions without end dates
       },
     },
     include: [
@@ -55,6 +56,7 @@ export async function getUpcomingSubscriptions(days: number = 30): Promise<Upcom
         model: User,
         as: 'user',
         attributes: ['id', 'email', 'externalId', 'plan', 'region'],
+        required: true, // Only include subscriptions with users
       },
     ],
     order: [['endDate', 'ASC']],
@@ -225,6 +227,7 @@ export async function triggerProactiveRetention(
       status: 'active',
       endDate: {
         [Op.between]: [new Date(), targetDate],
+        [Op.ne]: null, // Exclude subscriptions without end dates
       },
     },
     include: [
@@ -232,6 +235,7 @@ export async function triggerProactiveRetention(
         model: User,
         as: 'user',
         attributes: ['id', 'email', 'externalId', 'plan', 'region'],
+        required: true, // Only include subscriptions with users
       },
     ],
   });
@@ -347,19 +351,28 @@ export async function getSubscriptionStats(): Promise<{
     Subscription.count({
       where: {
         status: 'active',
-        endDate: { [Op.between]: [now, sevenDays] },
+        endDate: {
+          [Op.between]: [now, sevenDays],
+          [Op.ne]: null,
+        },
       },
     }),
     Subscription.count({
       where: {
         status: 'active',
-        endDate: { [Op.between]: [now, thirtyDays] },
+        endDate: {
+          [Op.between]: [now, thirtyDays],
+          [Op.ne]: null,
+        },
       },
     }),
     Subscription.count({
       where: {
         status: 'active',
-        endDate: { [Op.between]: [now, ninetyDays] },
+        endDate: {
+          [Op.between]: [now, ninetyDays],
+          [Op.ne]: null,
+        },
       },
     }),
   ]);
@@ -368,7 +381,10 @@ export async function getSubscriptionStats(): Promise<{
   const subscriptionsWithEndDates = await Subscription.findAll({
     where: {
       status: 'active',
-      endDate: { [Op.gte]: now },
+      endDate: {
+        [Op.gte]: now,
+        [Op.ne]: null,
+      },
     },
     attributes: ['value', 'endDate'],
   });
