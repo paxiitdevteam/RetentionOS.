@@ -56,6 +56,7 @@ export default function Layout({ children }: LayoutProps) {
 
         <nav style={{ flex: 1 }}>
           <NavLink href="/" label="Overview" icon="📊" />
+          <NavLink href="/subscriptions" label="Subscriptions" icon="💳" />
           <NavLink href="/analytics" label="Analytics" icon="📈" />
           <NavLink href="/flows" label="Flows" icon="🔄" />
           <NavLink href="/ai" label="AI Analytics" icon="🤖" />
@@ -113,6 +114,7 @@ export default function Layout({ children }: LayoutProps) {
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>
                 {router.pathname === '/' && 'Dashboard Overview'}
+                {router.pathname === '/subscriptions' && 'Subscription Monitoring'}
                 {router.pathname === '/analytics' && 'Analytics'}
                 {router.pathname === '/flows' && 'Retention Flows'}
                 {router.pathname === '/flows/builder' && 'Flow Builder'}
@@ -143,7 +145,8 @@ interface NavLinkProps {
 
 function NavLink({ href, label, icon }: NavLinkProps) {
   const router = useRouter();
-  const isActive = router.pathname === href;
+  // Check if current path matches or starts with href (for nested routes)
+  const isActive = router.pathname === href || (href !== '/' && router.pathname.startsWith(href));
 
   return (
     <a
