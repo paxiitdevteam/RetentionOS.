@@ -10,7 +10,7 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
-import { MessageModal } from '../components/Modal';
+import Modal, { MessageModal } from '../components/Modal';
 
 interface AIAgentActivity {
   id: number;
