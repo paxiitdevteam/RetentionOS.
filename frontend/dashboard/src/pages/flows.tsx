@@ -11,6 +11,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
 import { LoadingState, Alert, EmptyState, Button, Card } from '../components/ui';
+import Modal, { ModalActions, ModalButton } from '../components/Modal';
 
 interface Flow {
   id: number;
@@ -28,6 +29,9 @@ const Flows: NextPage = () => {
   const [flows, setFlows] = useState<Flow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [showDuplicateModal, setShowDuplicateModal] = useState<number | null>(null);
+  const [duplicateName, setDuplicateName] = useState('');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -52,15 +56,40 @@ const Flows: NextPage = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this flow?')) {
-      return;
-    }
+    setShowDeleteConfirm(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!showDeleteConfirm) return;
 
     try {
-      await apiClient.deleteFlow(id);
+      await apiClient.deleteFlow(showDeleteConfirm);
       await loadFlows();
+      setShowDeleteConfirm(null);
     } catch (err: any) {
       alert(err.message || 'Failed to delete flow');
+      setShowDeleteConfirm(null);
+    }
+  };
+
+  const handleDuplicate = async (id: number, currentName: string) => {
+    setShowDuplicateModal(id);
+    setDuplicateName(`${currentName} (Copy)`);
+  };
+
+  const confirmDuplicate = async () => {
+    if (!showDuplicateModal) return;
+
+    try {
+      const response = await apiClient.duplicateFlow(showDuplicateModal, duplicateName || undefined);
+      if (response.success) {
+        await loadFlows();
+        setShowDuplicateModal(null);
+        setDuplicateName('');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to duplicate flow');
+      setShowDuplicateModal(null);
     }
   };
 

@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../services/api';
+import Modal, { FormField, ModalActions, ModalButton } from '../../components/Modal';
 
 interface FlowStep {
   type: 'pause' | 'downgrade' | 'discount' | 'support' | 'feedback';
@@ -548,347 +549,299 @@ const FlowBuilder: NextPage = () => {
       </div>
 
       {/* Template Source Modal */}
-      {showTemplateModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
-          onClick={() => setShowTemplateModal(false)}
-        >
-          <div
+      <Modal
+        isOpen={showTemplateModal}
+        onClose={() => {
+          setShowTemplateModal(false);
+          setTemplateSource('source');
+          setTemplateUrl('');
+          setTemplateGoogleSheetsUrl('');
+          setTemplatePlan('');
+          setTemplateMinValue('');
+          setTemplateMaxValue('');
+          setTemplateRegion('');
+          setTemplateFile(null);
+        }}
+        title="Load Template from Source"
+        maxWidth="500px"
+      >
+        <FormField label="Template Source">
+          <select
+            value={templateSource}
+            onChange={(e) => setTemplateSource(e.target.value as any)}
             style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              maxWidth: '500px',
-              width: '90%',
-              maxHeight: '90vh',
-              overflow: 'auto',
+              width: '100%',
+              padding: '10px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+              boxSizing: 'border-box',
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#003A78', marginBottom: '20px' }}>
-              Load Template from Source
-            </h2>
+            <option value="source">From Source (Built-in Templates)</option>
+            <option value="database">From Subscription Database</option>
+            <option value="url">From Website URL</option>
+            <option value="excel">From Excel/CSV File</option>
+            <option value="googlesheets">From Google Sheets</option>
+            <option value="json">From JSON File</option>
+            <option value="xml">From XML File</option>
+          </select>
+        </FormField>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                Template Source
-              </label>
-              <select
-                value={templateSource}
-                onChange={(e) => setTemplateSource(e.target.value as any)}
+        {templateSource === 'url' && (
+          <FormField label="Website URL" required>
+            <input
+              type="url"
+              value={templateUrl}
+              onChange={(e) => setTemplateUrl(e.target.value)}
+              placeholder="https://example.com/templates.json"
+              required
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+          </FormField>
+        )}
+
+        {templateSource === 'googlesheets' && (
+          <FormField
+            label="Google Sheets URL"
+            required
+            helpText="Make sure the sheet is publicly accessible or shared with view permissions. CSV format will be used."
+          >
+            <input
+              type="url"
+              value={templateGoogleSheetsUrl}
+              onChange={(e) => setTemplateGoogleSheetsUrl(e.target.value)}
+              placeholder="https://docs.google.com/spreadsheets/d/..."
+              required
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+          </FormField>
+        )}
+
+        {templateSource === 'database' && (
+          <>
+            <FormField label="Plan (Optional)">
+              <input
+                type="text"
+                value={templatePlan}
+                onChange={(e) => setTemplatePlan(e.target.value)}
+                placeholder="e.g., premium, basic"
                 style={{
                   width: '100%',
                   padding: '10px',
                   border: '1px solid #ddd',
                   borderRadius: '6px',
                   fontSize: '14px',
+                  boxSizing: 'border-box',
                 }}
-              >
-                <option value="source">From Source (Built-in Templates)</option>
-                <option value="database">From Subscription Database</option>
-                <option value="url">From Website URL</option>
-                <option value="excel">From Excel/CSV File</option>
-                <option value="googlesheets">From Google Sheets</option>
-                <option value="json">From JSON File</option>
-                <option value="xml">From XML File</option>
-              </select>
+              />
+            </FormField>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+              <div style={{ flex: 1 }}>
+                <FormField label="Min Value ($)">
+                  <input
+                    type="number"
+                    value={templateMinValue}
+                    onChange={(e) => setTemplateMinValue(e.target.value)}
+                    placeholder="0"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </FormField>
+              </div>
+              <div style={{ flex: 1 }}>
+                <FormField label="Max Value ($)">
+                  <input
+                    type="number"
+                    value={templateMaxValue}
+                    onChange={(e) => setTemplateMaxValue(e.target.value)}
+                    placeholder="1000"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </FormField>
+              </div>
             </div>
-
-            {templateSource === 'url' && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  Website URL
-                </label>
-                <input
-                  type="url"
-                  value={templateUrl}
-                  onChange={(e) => setTemplateUrl(e.target.value)}
-                  placeholder="https://example.com/templates.json"
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-            )}
-
-            {templateSource === 'googlesheets' && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  Google Sheets URL
-                </label>
-                <input
-                  type="url"
-                  value={templateGoogleSheetsUrl}
-                  onChange={(e) => setTemplateGoogleSheetsUrl(e.target.value)}
-                  placeholder="https://docs.google.com/spreadsheets/d/..."
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                  Make sure the sheet is publicly accessible or shared with view permissions. CSV format will be used.
-                </div>
-              </div>
-            )}
-
-            {templateSource === 'database' && (
-              <>
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                    Plan (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={templatePlan}
-                    onChange={(e) => setTemplatePlan(e.target.value)}
-                    placeholder="e.g., premium, basic"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-                <div style={{ marginBottom: '16px', display: 'flex', gap: '12px' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                      Min Value ($)
-                    </label>
-                    <input
-                      type="number"
-                      value={templateMinValue}
-                      onChange={(e) => setTemplateMinValue(e.target.value)}
-                      placeholder="0"
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        boxSizing: 'border-box',
-                      }}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                      Max Value ($)
-                    </label>
-                    <input
-                      type="number"
-                      value={templateMaxValue}
-                      onChange={(e) => setTemplateMaxValue(e.target.value)}
-                      placeholder="1000"
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        boxSizing: 'border-box',
-                      }}
-                    />
-                  </div>
-                </div>
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                    Region (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={templateRegion}
-                    onChange={(e) => setTemplateRegion(e.target.value)}
-                    placeholder="e.g., US, EU"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-              </>
-            )}
-
-            {templateSource === 'excel' && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  Excel/CSV File
-                </label>
-                <input
-                  type="file"
-                  accept=".csv,.xlsx,.xls"
-                  onChange={(e) => setTemplateFile(e.target.files?.[0] || null)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                  CSV format: template_name,language,step_type,step_title,step_message,step_config
-                </div>
-              </div>
-            )}
-
-            {templateSource === 'json' && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  JSON File
-                </label>
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={(e) => setTemplateFile(e.target.files?.[0] || null)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                  Format: {`{ "templates": [{ "name": "...", "steps": [...] }] }`} or array of templates
-                </div>
-              </div>
-            )}
-
-            {templateSource === 'xml' && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  XML File
-                </label>
-                <input
-                  type="file"
-                  accept=".xml"
-                  onChange={(e) => setTemplateFile(e.target.files?.[0] || null)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                  Enterprise XML format with &lt;template&gt; and &lt;step&gt; elements
-                </div>
-              </div>
-            )}
-
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => {
-                  setShowTemplateModal(false);
-                  setTemplateSource('source');
-                  setTemplateUrl('');
-                  setTemplateGoogleSheetsUrl('');
-                  setTemplatePlan('');
-                  setTemplateMinValue('');
-                  setTemplateMaxValue('');
-                  setTemplateRegion('');
-                  setTemplateFile(null);
-                }}
+            <FormField label="Region (Optional)">
+              <input
+                type="text"
+                value={templateRegion}
+                onChange={(e) => setTemplateRegion(e.target.value)}
+                placeholder="e.g., US, EU"
                 style={{
-                  padding: '10px 20px',
-                  background: 'transparent',
-                  color: '#666',
+                  width: '100%',
+                  padding: '10px',
                   border: '1px solid #ddd',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  cursor: 'pointer',
+                  boxSizing: 'border-box',
                 }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    setLoadingTemplates(true);
-                    const response = await apiClient.getFlowTemplates(templateSource, {
-                      url: templateUrl || undefined,
-                      googleSheetsUrl: templateGoogleSheetsUrl || undefined,
-                      plan: templatePlan || undefined,
-                      minValue: templateMinValue ? parseFloat(templateMinValue) : undefined,
-                      maxValue: templateMaxValue ? parseFloat(templateMaxValue) : undefined,
-                      region: templateRegion || undefined,
-                      file: templateFile || undefined,
-                    });
+              />
+            </FormField>
+          </>
+        )}
 
-                    if (response.success && response.templates.length > 0) {
-                      // Show template selector
-                      const templateNames = response.templates.map((t: Flow, i: number) => `${i + 1}. ${t.name}`).join('\n');
-                      const selection = prompt(`Select a template (1-${response.templates.length}):\n\n${templateNames}`);
-                      const index = parseInt(selection || '') - 1;
-                      if (index >= 0 && index < response.templates.length) {
-                        if (confirm(`Load "${response.templates[index].name}" template? This will replace your current flow.`)) {
-                          handleLoadTemplate(response.templates[index]);
-                          setShowTemplateModal(false);
-                        }
-                      }
-                    } else {
-                      alert('No templates found from selected source');
+        {templateSource === 'excel' && (
+          <FormField
+            label="Excel/CSV File"
+            required
+            helpText="CSV format: template_name,language,step_type,step_title,step_message,step_config"
+          >
+            <input
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={(e) => setTemplateFile(e.target.files?.[0] || null)}
+              required
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+          </FormField>
+        )}
+
+        {templateSource === 'json' && (
+          <FormField
+            label="JSON File"
+            required
+            helpText={`Format: { "templates": [{ "name": "...", "steps": [...] }] } or array of templates`}
+          >
+            <input
+              type="file"
+              accept=".json"
+              onChange={(e) => setTemplateFile(e.target.files?.[0] || null)}
+              required
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+          </FormField>
+        )}
+
+        {templateSource === 'xml' && (
+          <FormField
+            label="XML File"
+            required
+            helpText="Enterprise XML format with <template> and <step> elements"
+          >
+            <input
+              type="file"
+              accept=".xml"
+              onChange={(e) => setTemplateFile(e.target.files?.[0] || null)}
+              required
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+          </FormField>
+        )}
+
+        <ModalActions>
+          <ModalButton
+            variant="secondary"
+            onClick={() => {
+              setShowTemplateModal(false);
+              setTemplateSource('source');
+              setTemplateUrl('');
+              setTemplateGoogleSheetsUrl('');
+              setTemplatePlan('');
+              setTemplateMinValue('');
+              setTemplateMaxValue('');
+              setTemplateRegion('');
+              setTemplateFile(null);
+            }}
+          >
+            Cancel
+          </ModalButton>
+          <ModalButton
+            variant="primary"
+            onClick={async () => {
+              try {
+                setLoadingTemplates(true);
+                const response = await apiClient.getFlowTemplates(templateSource, {
+                  url: templateUrl || undefined,
+                  googleSheetsUrl: templateGoogleSheetsUrl || undefined,
+                  plan: templatePlan || undefined,
+                  minValue: templateMinValue ? parseFloat(templateMinValue) : undefined,
+                  maxValue: templateMaxValue ? parseFloat(templateMaxValue) : undefined,
+                  region: templateRegion || undefined,
+                  file: templateFile || undefined,
+                });
+
+                if (response.success && response.templates.length > 0) {
+                  // Show template selector
+                  const templateNames = response.templates.map((t: Flow, i: number) => `${i + 1}. ${t.name}`).join('\n');
+                  const selection = prompt(`Select a template (1-${response.templates.length}):\n\n${templateNames}`);
+                  const index = parseInt(selection || '') - 1;
+                  if (index >= 0 && index < response.templates.length) {
+                    if (confirm(`Load "${response.templates[index].name}" template? This will replace your current flow.`)) {
+                      handleLoadTemplate(response.templates[index]);
+                      setShowTemplateModal(false);
                     }
-                  } catch (err: any) {
-                    alert(err.message || 'Failed to load templates');
-                    console.error('Failed to load templates:', err);
-                  } finally {
-                    setLoadingTemplates(false);
                   }
-                }}
-                disabled={loadingTemplates || 
-                  (templateSource === 'url' && !templateUrl) || 
-                  (templateSource === 'excel' && !templateFile) ||
-                  (templateSource === 'googlesheets' && !templateGoogleSheetsUrl) ||
-                  (templateSource === 'json' && !templateFile) ||
-                  (templateSource === 'xml' && !templateFile)}
-                style={{
-                  padding: '10px 20px',
-                  background: loadingTemplates ? '#ccc' : '#003A78',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  cursor: loadingTemplates ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {loadingTemplates ? 'Loading...' : 'Load Templates'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                } else {
+                  alert('No templates found from selected source');
+                }
+              } catch (err: any) {
+                alert(err.message || 'Failed to load templates');
+                console.error('Failed to load templates:', err);
+              } finally {
+                setLoadingTemplates(false);
+              }
+            }}
+            disabled={
+              loadingTemplates ||
+              (templateSource === 'url' && !templateUrl) ||
+              (templateSource === 'excel' && !templateFile) ||
+              (templateSource === 'googlesheets' && !templateGoogleSheetsUrl) ||
+              (templateSource === 'json' && !templateFile) ||
+              (templateSource === 'xml' && !templateFile)
+            }
+          >
+            {loadingTemplates ? 'Loading...' : 'Load Templates'}
+          </ModalButton>
+        </ModalActions>
+      </Modal>
     </Layout>
   );
 };

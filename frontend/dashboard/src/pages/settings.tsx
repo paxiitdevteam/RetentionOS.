@@ -37,6 +37,7 @@ const Settings: NextPage = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -185,36 +186,39 @@ const Settings: NextPage = () => {
               </div>
             )}
 
-            {!showPasswordForm ? (
-              <button
-                onClick={() => setShowPasswordForm(true)}
-                style={{
-                  padding: '10px 20px',
-                  background: '#003A78',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                }}
+            <button
+              onClick={() => setShowPasswordForm(true)}
+              style={{
+                padding: '10px 20px',
+                background: '#003A78',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              Change Password
+            </button>
+
+            <Modal
+              isOpen={showPasswordForm}
+              onClose={() => {
+                setShowPasswordForm(false);
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+                setPasswordError('');
+              }}
+              title="Change Password"
+              maxWidth="500px"
+            >
+              <form
+                onSubmit={handlePasswordChange}
+                style={{ margin: 0 }}
               >
-                Change Password
-              </button>
-            ) : (
-              <form onSubmit={handlePasswordChange} style={{ marginTop: '16px' }}>
-                <div style={{ marginBottom: '16px' }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: '#333',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    Current Password
-                  </label>
+                <FormField label="Current Password" required error={passwordError && passwordError.includes('current') ? passwordError : undefined}>
                   <input
                     type="password"
                     value={currentPassword}
@@ -222,7 +226,6 @@ const Settings: NextPage = () => {
                     required
                     style={{
                       width: '100%',
-                      maxWidth: '400px',
                       padding: '10px',
                       border: '1px solid #ddd',
                       borderRadius: '6px',
@@ -231,28 +234,22 @@ const Settings: NextPage = () => {
                     }}
                     placeholder="Enter current password"
                   />
-                </div>
+                </FormField>
 
-                <div style={{ marginBottom: '16px' }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: '#333',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    New Password
-                  </label>
+                <FormField
+                  label="New Password"
+                  required
+                  helpText="Must contain: uppercase, lowercase, number, and special character (min 12 characters)"
+                  error={passwordError && !passwordError.includes('current') && !passwordError.includes('match') ? passwordError : undefined}
+                >
                   <input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
+                    minLength={12}
                     style={{
                       width: '100%',
-                      maxWidth: '400px',
                       padding: '10px',
                       border: '1px solid #ddd',
                       borderRadius: '6px',
@@ -261,23 +258,13 @@ const Settings: NextPage = () => {
                     }}
                     placeholder="Enter new password (min 12 chars)"
                   />
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                    Must contain: uppercase, lowercase, number, and special character
-                  </div>
-                </div>
+                </FormField>
 
-                <div style={{ marginBottom: '16px' }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: '#333',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    Confirm New Password
-                  </label>
+                <FormField
+                  label="Confirm New Password"
+                  required
+                  error={passwordError && passwordError.includes('match') ? passwordError : undefined}
+                >
                   <input
                     type="password"
                     value={confirmPassword}
@@ -285,7 +272,6 @@ const Settings: NextPage = () => {
                     required
                     style={{
                       width: '100%',
-                      maxWidth: '400px',
                       padding: '10px',
                       border: '1px solid #ddd',
                       borderRadius: '6px',
@@ -294,9 +280,9 @@ const Settings: NextPage = () => {
                     }}
                     placeholder="Confirm new password"
                   />
-                </div>
+                </FormField>
 
-                {passwordError && (
+                {passwordError && !passwordError.includes('current') && !passwordError.includes('match') && (
                   <div
                     style={{
                       background: '#fee',
@@ -311,25 +297,9 @@ const Settings: NextPage = () => {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    type="submit"
-                    disabled={passwordLoading}
-                    style={{
-                      padding: '10px 20px',
-                      background: passwordLoading ? '#ccc' : '#003A78',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      cursor: passwordLoading ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    {passwordLoading ? 'Updating...' : 'Update Password'}
-                  </button>
-                  <button
-                    type="button"
+                <ModalActions>
+                  <ModalButton
+                    variant="secondary"
                     onClick={() => {
                       setShowPasswordForm(false);
                       setCurrentPassword('');
@@ -337,24 +307,44 @@ const Settings: NextPage = () => {
                       setConfirmPassword('');
                       setPasswordError('');
                     }}
-                    style={{
-                      padding: '10px 20px',
-                      background: 'transparent',
-                      color: '#666',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      cursor: 'pointer',
-                    }}
                   >
                     Cancel
-                  </button>
-                </div>
+                  </ModalButton>
+                  <ModalButton
+                    variant="primary"
+                    onClick={() => {}}
+                    disabled={passwordLoading}
+                    type="submit"
+                  >
+                    {passwordLoading ? 'Updating...' : 'Update Password'}
+                  </ModalButton>
+                </ModalActions>
               </form>
-            )}
+            </Modal>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <Modal
+          isOpen={showDeleteConfirm !== null}
+          onClose={() => setShowDeleteConfirm(null)}
+          title="Delete API Key"
+          maxWidth="400px"
+        >
+          <div style={{ marginBottom: '20px' }}>
+            <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
+              Are you sure you want to delete this API key? This action cannot be undone.
+            </p>
+          </div>
+          <ModalActions>
+            <ModalButton variant="secondary" onClick={() => setShowDeleteConfirm(null)}>
+              Cancel
+            </ModalButton>
+            <ModalButton variant="danger" onClick={confirmDeleteKey}>
+              Delete
+            </ModalButton>
+          </ModalActions>
+        </Modal>
 
         {/* API Keys Section */}
         <div
@@ -386,70 +376,64 @@ const Settings: NextPage = () => {
             </button>
           </div>
 
-          {showNewKey && newKey && (
-            <div
-              style={{
-                background: '#f0f4f8',
-                border: '2px solid #003A78',
-                padding: '16px',
-                borderRadius: '6px',
-                marginBottom: '20px',
-              }}
-            >
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#003A78', marginBottom: '8px' }}>
-                ⚠️ New API Key Created - Save this key now!
+          <Modal
+            isOpen={showNewKey && !!newKey}
+            onClose={() => {
+              setShowNewKey(false);
+              setNewKey(null);
+            }}
+            title="New API Key Created"
+            maxWidth="500px"
+          >
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
+                ⚠️ <strong>Save this key now!</strong> This key will not be shown again. Make sure to copy it to a secure location.
               </div>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '12px' }}>
-                This key will not be shown again. Make sure to copy it to a secure location.
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '8px',
-                  alignItems: 'center',
-                  background: 'white',
-                  padding: '12px',
-                  borderRadius: '4px',
-                  marginBottom: '8px',
-                }}
-              >
-                <code style={{ flex: 1, fontSize: '14px', fontFamily: 'monospace', color: '#333' }}>
-                  {newKey.key}
-                </code>
-                <button
-                  onClick={() => copyToClipboard(newKey.key)}
+              <FormField label="API Key">
+                <div
                   style={{
-                    padding: '6px 12px',
-                    background: '#003A78',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    cursor: 'pointer',
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'center',
+                    background: '#f8f9fa',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd',
                   }}
                 >
-                  Copy
-                </button>
-              </div>
-              <button
+                  <code style={{ flex: 1, fontSize: '14px', fontFamily: 'monospace', color: '#333', wordBreak: 'break-all' }}>
+                    {newKey?.key}
+                  </code>
+                  <button
+                    onClick={() => copyToClipboard(newKey?.key || '')}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#003A78',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Copy
+                  </button>
+                </div>
+              </FormField>
+            </div>
+            <ModalActions>
+              <ModalButton
+                variant="primary"
                 onClick={() => {
                   setShowNewKey(false);
                   setNewKey(null);
                 }}
-                style={{
-                  padding: '6px 12px',
-                  background: 'transparent',
-                  color: '#666',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                }}
               >
                 I've saved it
-              </button>
-            </div>
-          )}
+              </ModalButton>
+            </ModalActions>
+          </Modal>
 
           {loading && (
             <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>

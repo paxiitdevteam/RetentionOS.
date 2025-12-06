@@ -9,6 +9,7 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
+import Modal, { ModalActions, ModalButton } from '../components/Modal';
 
 interface UpcomingSubscription {
   subscriptionId: number;
@@ -79,19 +80,27 @@ const Subscriptions: NextPage = () => {
     }
   };
 
-  const handleTriggerRetention = async () => {
-    if (!confirm('Trigger proactive retention for all subscriptions expiring in 7 days?')) {
-      return;
-    }
+  const [showTriggerConfirm, setShowTriggerConfirm] = useState(false);
+  const [triggerResult, setTriggerResult] = useState<{ triggered: number; failed: number } | null>(null);
 
+  const handleTriggerRetention = async () => {
+    setShowTriggerConfirm(true);
+  };
+
+  const confirmTriggerRetention = async () => {
     try {
       const response = await apiClient.triggerProactiveRetention(7);
       if (response.success) {
-        alert(`✅ Triggered ${response.triggered} retention flows (${response.failed} failed)`);
+        setTriggerResult({ triggered: response.triggered, failed: response.failed });
         loadData();
+        setTimeout(() => {
+          setShowTriggerConfirm(false);
+          setTriggerResult(null);
+        }, 3000);
       }
     } catch (error: any) {
       alert(`Error: ${error.message || 'Failed to trigger retention'}`);
+      setShowTriggerConfirm(false);
     }
   };
 
