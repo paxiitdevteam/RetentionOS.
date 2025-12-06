@@ -1,9 +1,11 @@
 /**
  * Reusable Modal Component
  * Consistent modal/dialog style for all forms across the dashboard
+ * With smooth animations and proper centering
  */
 
 import { ReactNode } from 'react';
+import './Modal.css';
 
 interface ModalProps {
   isOpen: boolean;
@@ -221,6 +223,55 @@ export function ModalButton({
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * Success/Error Message Modal Component
+ */
+interface MessageModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  type: 'success' | 'error' | 'info';
+  title: string;
+  message: string;
+}
+
+export function MessageModal({ isOpen, onClose, type, title, message }: MessageModalProps) {
+  if (!isOpen) return null;
+
+  const colors = {
+    success: { bg: '#e8f5e9', text: '#1F9D55', icon: '✅' },
+    error: { bg: '#fee', text: '#c33', icon: '❌' },
+    info: { bg: '#e3f2fd', text: '#1976d2', icon: 'ℹ️' },
+  };
+
+  const color = colors[type];
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="400px">
+      <div style={{ marginBottom: '20px' }}>
+        <div
+          style={{
+            background: color.bg,
+            color: color.text,
+            padding: '16px',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <span style={{ fontSize: '24px' }}>{color.icon}</span>
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: 500 }}>{message}</p>
+        </div>
+      </div>
+      <ModalActions>
+        <ModalButton variant="primary" onClick={onClose}>
+          OK
+        </ModalButton>
+      </ModalActions>
+    </Modal>
   );
 }
 
