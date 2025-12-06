@@ -26,6 +26,7 @@ export default function Modal({
 
   return (
     <div
+      className="modal-overlay"
       style={{
         position: 'fixed',
         top: 0,
@@ -36,11 +37,12 @@ export default function Modal({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000,
+        zIndex: 10000,
       }}
       onClick={onClose}
     >
       <div
+        className="modal-content"
         style={{
           background: 'white',
           borderRadius: '8px',
@@ -50,7 +52,7 @@ export default function Modal({
           width: '90%',
           maxHeight: '90vh',
           overflow: 'auto',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -219,6 +221,55 @@ export function ModalButton({
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * Success/Error Message Modal Component
+ */
+interface MessageModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  type: 'success' | 'error' | 'info';
+  title: string;
+  message: string;
+}
+
+export function MessageModal({ isOpen, onClose, type, title, message }: MessageModalProps) {
+  if (!isOpen) return null;
+
+  const colors = {
+    success: { bg: '#e8f5e9', text: '#1F9D55', icon: '✅' },
+    error: { bg: '#fee', text: '#c33', icon: '❌' },
+    info: { bg: '#e3f2fd', text: '#1976d2', icon: 'ℹ️' },
+  };
+
+  const color = colors[type];
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="400px">
+      <div style={{ marginBottom: '20px' }}>
+        <div
+          style={{
+            background: color.bg,
+            color: color.text,
+            padding: '16px',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <span style={{ fontSize: '24px' }}>{color.icon}</span>
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: 500 }}>{message}</p>
+        </div>
+      </div>
+      <ModalActions>
+        <ModalButton variant="primary" onClick={onClose}>
+          OK
+        </ModalButton>
+      </ModalActions>
+    </Modal>
   );
 }
 
