@@ -1,0 +1,196 @@
+# RetentionOS - Development Docker Compose
+# Perfect configuration for local development
+# Can be reused as template for other projects
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: retentionos-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-retentionos_dev}
+      - DB_USER=${DB_USER:-retentionos}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-key-change-in-production}
+      - JWT_EXPIRES_IN=7d
+      - API_KEY_SECRET=${API_KEY_SECRET:-dev-api-key-secret}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_your_stripe_secret_key}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_your_webhook_secret}
+      - DASHBOARD_URL=http://localhost:3001
+      - WIDGET_CDN_URL=http://localhost:3002
+      - CORS_ORIGIN=*
+    volumes:
+      # Mount source code for hot reload in development
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - ./backend/tsconfig.json:/app/tsconfig.json
+      - backend_node_modules:/app/node_modules
+      - backend_logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - retentionos-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: npm run dev
+
+  # Dashboard Frontend Service
+  dashboard:
+    build:
+      context: ./frontend/dashboard
+      dockerfile: Dockerfile
+    container_name: retentionos-dashboard
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    volumes:
+      # Mount source code for hot reload
+      - ./frontend/dashboard/src:/app/src
+      - ./frontend/dashboard/public:/app/public
+      - ./frontend/dashboard/package.json:/app/package.json
+      - ./frontend/dashboard/next.config.js:/app/next.config.js
+      - ./frontend/dashboard/tailwind.config.js:/app/tailwind.config.js
+      - ./frontend/dashboard/tsconfig.json:/app/tsconfig.json
+      - dashboard_node_modules:/app/node_modules
+      - dashboard_next:/app/.next
+    depends_on:
+      - backend
+    networks:
+      - retentionos-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: npm run dev
+
+  # Marketing Website Service
+  marketing:
+    build:
+      context: ./frontend/marketing-html
+      dockerfile: Dockerfile
+    container_name: retentionos-marketing
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+    volumes:
+      # Mount source for live updates
+      - ./frontend/marketing-html:/app
+      - marketing_node_modules:/app/node_modules
+    networks:
+      - retentionos-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Database Service (MariaDB)
+  db:
+    image: mariadb:10.11
+    container_name: retentionos-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-rootpassword}
+      - MYSQL_USER=${DB_USER:-retentionos}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-password}
+      - MYSQL_DATABASE=${DB_NAME:-retentionos_dev}
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Auto-run migrations on first start
+      - ./backend/src/migrations:/docker-entrypoint-initdb.d:ro
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=200
+      --innodb-buffer-pool-size=256M
+    networks:
+      - retentionos-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Redis Cache Service
+  redis:
+    image: redis:7-alpine
+    container_name: retentionos-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    networks:
+      - retentionos-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+# Named volumes for data persistence
+volumes:
+  db_data:
+    driver: local
+    name: retentionos_db_data
+  redis_data:
+    driver: local
+    name: retentionos_redis_data
+  backend_node_modules:
+    driver: local
+    name: retentionos_backend_node_modules
+  dashboard_node_modules:
+    driver: local
+    name: retentionos_dashboard_node_modules
+  dashboard_next:
+    driver: local
+    name: retentionos_dashboard_next
+  marketing_node_modules:
+    driver: local
+    name: retentionos_marketing_node_modules
+  backend_logs:
+    driver: local
+    name: retentionos_backend_logs
+
+# Network for service communication
+networks:
+  retentionos-network:
+    driver: bridge
+    name: retentionos-network
+

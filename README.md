@@ -183,11 +183,22 @@ npm install
 npm run build
 ```
 
-5. **Docker Setup (Alternative)**
+5. **Docker Setup (Recommended)**
 ```bash
-cd infra
-docker-compose up
+# Quick start with helper script
+./docker-start.sh
+
+# Or manually
+docker-compose up -d
+
+# View logs
+./docker-logs.sh
+
+# Stop services
+./docker-stop.sh
 ```
+
+See [DOCKER_SETUP.md](DOCKER_SETUP.md) for complete Docker documentation.
 
 ## 📚 Documentation
 
