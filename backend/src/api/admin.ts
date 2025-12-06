@@ -1409,7 +1409,9 @@ router.get('/subscriptions/stats', authenticate, async (req: Request, res: Respo
       return;
     }
 
-    const stats = await getSubscriptionStats();
+    // Import dynamically to ensure module is loaded
+    const { getSubscriptionStats: getStats } = await import('../services/SubscriptionMonitorService');
+    const stats = await getStats();
 
     res.json({
       success: true,
