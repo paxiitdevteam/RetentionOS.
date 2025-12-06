@@ -364,13 +364,15 @@ class ApiClient {
     });
   }
 
-  async getFlowTemplates(source: 'source' | 'database' | 'url' | 'excel' = 'source', options?: {
+  async getFlowTemplates(source: 'source' | 'database' | 'url' | 'excel' | 'googlesheets' | 'json' | 'xml' = 'source', options?: {
     url?: string;
     plan?: string;
     minValue?: number;
     maxValue?: number;
     region?: string;
     file?: File;
+    googleSheetsUrl?: string;
+    googleSheetsApiKey?: string;
   }) {
     if (source === 'database') {
       return this.request<{
@@ -404,6 +406,28 @@ class ApiClient {
         throw new Error('Excel file is required');
       }
       return this.parseExcelFile(options.file);
+    }
+
+    if (source === 'googlesheets') {
+      // Load from Google Sheets
+      if (!options?.googleSheetsUrl) {
+        throw new Error('Google Sheets URL is required');
+      }
+      return this.loadFromGoogleSheets(options.googleSheetsUrl, options.googleSheetsApiKey);
+    }
+
+    if (source === 'json') {
+      if (!options?.file) {
+        throw new Error('JSON file is required');
+      }
+      return this.parseJSONFile(options.file);
+    }
+
+    if (source === 'xml') {
+      if (!options?.file) {
+        throw new Error('XML file is required');
+      }
+      return this.parseXMLFile(options.file);
     }
 
     // Default: get from source

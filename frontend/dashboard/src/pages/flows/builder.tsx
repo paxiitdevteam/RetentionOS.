@@ -40,8 +40,9 @@ const FlowBuilder: NextPage = () => {
   const [saving, setSaving] = useState(false);
   const [validation, setValidation] = useState<{ valid: boolean; errors: string[]; warnings: string[] } | null>(null);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [templateSource, setTemplateSource] = useState<'source' | 'database' | 'url' | 'excel'>('source');
+  const [templateSource, setTemplateSource] = useState<'source' | 'database' | 'url' | 'excel' | 'googlesheets' | 'json' | 'xml'>('source');
   const [templateUrl, setTemplateUrl] = useState('');
+  const [templateGoogleSheetsUrl, setTemplateGoogleSheetsUrl] = useState('');
   const [templatePlan, setTemplatePlan] = useState('');
   const [templateMinValue, setTemplateMinValue] = useState('');
   const [templateMaxValue, setTemplateMaxValue] = useState('');

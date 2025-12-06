@@ -1188,6 +1188,130 @@ router.post('/flows/templates/from-excel', authenticate, async (req: Request, re
 });
 
 /**
+ * POST /admin/flows/templates/from-googlesheets
+ * Load templates from Google Sheets
+ * Requires authentication
+ */
+router.post('/flows/templates/from-googlesheets', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const { url } = req.body;
+    if (!url) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'Google Sheets URL is required',
+      });
+      return;
+    }
+
+    // Convert Google Sheets URL to CSV export format
+    let csvUrl = url;
+    if (url.includes('/spreadsheets/d/')) {
+      const sheetIdMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (sheetIdMatch) {
+        const sheetId = sheetIdMatch[1];
+        const gidMatch = url.match(/[#&]gid=(\d+)/);
+        const gid = gidMatch ? gidMatch[1] : '0';
+        csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+      }
+    }
+
+    // Fetch CSV from Google Sheets
+    const https = require('https');
+    const http = require('http');
+    const urlModule = require('url');
+    const parsedUrl = urlModule.parse(csvUrl);
+    const client = parsedUrl.protocol === 'https:' ? https : http;
+
+    const csvText = await new Promise<string>((resolve, reject) => {
+      const req = client.get(csvUrl, { headers: { 'User-Agent': 'RetentionOS/1.0' } }, (res: any) => {
+        let data = '';
+        res.on('data', (chunk: any) => { data += chunk; });
+        res.on('end', () => {
+          if (res.statusCode === 200) {
+            resolve(data);
+          } else {
+            reject(new Error(`Failed to fetch Google Sheets: ${res.statusMessage}`));
+          }
+        });
+      });
+      req.on('error', reject);
+      req.setTimeout(10000, () => {
+        req.destroy();
+        reject(new Error('Request timeout'));
+      });
+    });
+
+    // Parse CSV to templates (simplified - full parsing in frontend)
+    const templates = parseCSVToTemplates(csvText);
+
+    res.json({
+      success: true,
+      templates,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to load templates from Google Sheets',
+    });
+  }
+});
+
+// Helper function to parse CSV to templates
+function parseCSVToTemplates(csvText: string): any[] {
+  const lines = csvText.split('\n').filter(line => line.trim());
+  if (lines.length < 2) {
+    return [];
+  }
+
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const templates: any[] = [];
+  const templateMap = new Map<string, any>();
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+    const row: any = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] || '';
+    });
+
+    const templateName = row['template_name'] || row['name'] || 'Imported Template';
+    if (!templateMap.has(templateName)) {
+      templateMap.set(templateName, {
+        name: templateName,
+        language: row['language'] || 'en',
+        steps: [],
+      });
+    }
+
+    const template = templateMap.get(templateName);
+    if (row['step_type'] && row['step_title'] && row['step_message']) {
+      let config = {};
+      try {
+        config = row['step_config'] ? JSON.parse(row['step_config']) : {};
+      } catch (e) {
+        // Ignore config parsing errors
+      }
+      template.steps.push({
+        type: row['step_type'],
+        title: row['step_title'],
+        message: row['step_message'],
+        config,
+      });
+    }
+  }
+
+  return Array.from(templateMap.values());
+}
+
+/**
  * POST /admin/flows/:id/activate
  * Activate flow (set ranking score > 0)
  * Requires authentication and admin role
