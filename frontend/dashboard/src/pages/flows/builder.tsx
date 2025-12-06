@@ -74,9 +74,12 @@ const FlowBuilder: NextPage = () => {
     try {
       setSaving(true);
       
-      // Validate flow
-      await handleValidate();
-      if (validation && !validation.valid) {
+      // Validate flow first
+      const validationResponse = await apiClient.validateFlow(flow);
+      setValidation(validationResponse.validation);
+      
+      if (!validationResponse.validation.valid) {
+        alert(`Flow validation failed:\n${validationResponse.validation.errors.join('\n')}`);
         setSaving(false);
         return;
       }
@@ -85,14 +88,13 @@ const FlowBuilder: NextPage = () => {
         // Update existing flow
         const response = await apiClient.updateFlowFull(flow.id, flow);
         setFlow({ ...flow, ...response.flow });
+        alert('Flow saved successfully!');
       } else {
         // Create new flow
         const response = await apiClient.createFlow(flow);
         router.push(`/flows/builder?id=${response.flow.id}`);
         return;
       }
-      
-      alert('Flow saved successfully!');
     } catch (err: any) {
       alert(err.message || 'Failed to save flow');
     } finally {
@@ -391,12 +393,18 @@ const FlowBuilder: NextPage = () => {
                   try {
                     const response = await apiClient.getFlowTemplates();
                     if (response.success && response.templates.length > 0) {
-                      // Show template selector (simplified - just use first template)
-                      if (confirm('Load "Standard Retention Flow" template?')) {
-                        handleLoadTemplate(response.templates[0]);
+                      // Show template selector
+                      const templateNames = response.templates.map((t: Flow, i: number) => `${i + 1}. ${t.name}`).join('\n');
+                      const selection = prompt(`Select a template (1-${response.templates.length}):\n\n${templateNames}`);
+                      const index = parseInt(selection || '') - 1;
+                      if (index >= 0 && index < response.templates.length) {
+                        if (confirm(`Load "${response.templates[index].name}" template? This will replace your current flow.`)) {
+                          handleLoadTemplate(response.templates[index]);
+                        }
                       }
                     }
                   } catch (err: any) {
+                    alert(err.message || 'Failed to load templates');
                     console.error('Failed to load templates:', err);
                   }
                 }}
@@ -564,17 +572,33 @@ function StepEditor({ step, index, onChange }: StepEditorProps) {
         <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
           Step Type
         </label>
-        <div style={{ 
-          padding: '8px 12px', 
-          background: '#f0f4f8', 
-          borderRadius: '6px',
-          color: '#003A78',
-          fontWeight: 500,
-          textTransform: 'capitalize',
-          display: 'inline-block',
-        }}>
-          {step.type}
-        </div>
+        <select
+          value={step.type}
+          onChange={(e) => {
+            const newType = e.target.value as FlowStep['type'];
+            // Reset config when changing type
+            const newConfig = newType === 'discount' ? { percentage: 20 } : 
+                             newType === 'downgrade' ? { plan: '' } : 
+                             undefined;
+            onChange({ type: newType, config: newConfig });
+          }}
+          style={{
+            padding: '8px 12px',
+            border: '1px solid #ddd',
+            borderRadius: '6px',
+            fontSize: '14px',
+            background: 'white',
+            color: '#333',
+            cursor: 'pointer',
+            textTransform: 'capitalize',
+          }}
+        >
+          <option value="pause">Pause</option>
+          <option value="downgrade">Downgrade</option>
+          <option value="discount">Discount</option>
+          <option value="support">Support</option>
+          <option value="feedback">Feedback</option>
+        </select>
       </div>
 
       <div style={{ marginBottom: '20px' }}>
@@ -664,6 +688,68 @@ function StepEditor({ step, index, onChange }: StepEditorProps) {
           />
         </div>
       )}
+
+      {step.type === 'pause' && (
+        <div style={{ marginBottom: '20px', padding: '12px', background: '#f0f4f8', borderRadius: '6px' }}>
+          <div style={{ fontSize: '12px', color: '#666' }}>
+            💡 Pause steps allow users to temporarily pause their subscription without canceling.
+          </div>
+        </div>
+      )}
+
+      {step.type === 'support' && (
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+            Support Contact (Optional)
+          </label>
+          <input
+            type="text"
+            value={step.config?.contact || ''}
+            onChange={(e) => onChange({ config: { ...step.config, contact: e.target.value } })}
+            placeholder="e.g., support@example.com or +1-800-123-4567"
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+              boxSizing: 'border-box',
+            }}
+          />
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+            Leave blank to use default support contact
+          </div>
+        </div>
+      )}
+
+      {step.type === 'feedback' && (
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+            Feedback Type
+          </label>
+          <select
+            value={step.config?.feedbackType || 'general'}
+            onChange={(e) => onChange({ config: { ...step.config, feedbackType: e.target.value } })}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+              boxSizing: 'border-box',
+            }}
+          >
+            <option value="general">General Feedback</option>
+            <option value="pricing">Pricing</option>
+            <option value="features">Missing Features</option>
+            <option value="performance">Performance Issues</option>
+            <option value="other">Other</option>
+          </select>
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+            This helps categorize the feedback for analysis
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -722,6 +808,67 @@ function FlowPreview({ steps }: FlowPreviewProps) {
               display: 'inline-block',
             }}>
               Downgrade to {step.config.plan}
+            </div>
+          )}
+          {step.type === 'pause' && (
+            <button style={{
+              padding: '10px 20px',
+              background: '#003A78',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              marginTop: '8px',
+            }}>
+              Pause Subscription
+            </button>
+          )}
+          {step.type === 'support' && (
+            <button style={{
+              padding: '10px 20px',
+              background: '#1F9D55',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              marginTop: '8px',
+            }}>
+              Contact Support
+            </button>
+          )}
+          {step.type === 'feedback' && (
+            <div style={{ marginTop: '12px' }}>
+              <textarea
+                placeholder="Enter your feedback..."
+                rows={3}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                }}
+              />
+              <button style={{
+                padding: '8px 16px',
+                background: '#003A78',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                marginTop: '8px',
+              }}>
+                Submit Feedback
+              </button>
             </div>
           )}
         </div>

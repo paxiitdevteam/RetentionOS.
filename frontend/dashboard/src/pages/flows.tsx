@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
-import { LoadingState, Alert, EmptyState, Button } from '../components/ui';
+import { LoadingState, Alert, EmptyState, Button, Card } from '../components/ui';
 
 interface Flow {
   id: number;
@@ -117,8 +117,23 @@ const Flows: NextPage = () => {
                         <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#003A78', margin: '0 0 8px 0' }}>
                           {flow.name}
                         </h3>
-                        <div style={{ fontSize: '14px', color: '#666' }}>
-                          Language: {flow.language} • Steps: {flow.steps.length} • Ranking: {flow.rankingScore}
+                        <div style={{ fontSize: '14px', color: '#666', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                          <span>Language: {flow.language}</span>
+                          <span>•</span>
+                          <span>Steps: {flow.steps.length}</span>
+                          <span>•</span>
+                          <span>Ranking: {flow.rankingScore}</span>
+                          <span>•</span>
+                          <span style={{ 
+                            padding: '2px 8px', 
+                            borderRadius: '4px', 
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            background: flow.rankingScore > 0 ? '#e8f5e9' : '#fff3e0',
+                            color: flow.rankingScore > 0 ? '#1F9D55' : '#f39c12'
+                          }}>
+                            {flow.rankingScore > 0 ? '✓ Active' : '○ Inactive'}
+                          </span>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px' }}>
@@ -127,6 +142,20 @@ const Flows: NextPage = () => {
                           onClick={() => router.push(`/flows/builder?id=${flow.id}`)}
                         >
                           Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              const newName = prompt('Enter name for duplicate (or leave blank for default):');
+                              await apiClient.duplicateFlow(flow.id, newName || undefined);
+                              await loadFlows();
+                            } catch (err: any) {
+                              alert(err.message || 'Failed to duplicate flow');
+                            }
+                          }}
+                        >
+                          Duplicate
                         </Button>
                         <Button
                           size="sm"
