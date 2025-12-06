@@ -14,11 +14,13 @@ interface SubscriptionAttributes {
   value: number | null;
   status: string | null;
   cancelAttempts: number;
+  endDate: Date | null;
+  renewalDate: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-interface SubscriptionCreationAttributes extends Optional<SubscriptionAttributes, 'id' | 'stripeSubscriptionId' | 'value' | 'status' | 'cancelAttempts' | 'createdAt' | 'updatedAt'> {
+interface SubscriptionCreationAttributes extends Optional<SubscriptionAttributes, 'id' | 'stripeSubscriptionId' | 'value' | 'status' | 'cancelAttempts' | 'endDate' | 'renewalDate' | 'createdAt' | 'updatedAt'> {
   userId: number;
 }
 
@@ -29,6 +31,8 @@ class Subscription extends Model<SubscriptionAttributes, SubscriptionCreationAtt
   public value!: number | null;
   public status!: string | null;
   public cancelAttempts!: number;
+  public endDate!: Date | null;
+  public renewalDate!: Date | null;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -77,6 +81,16 @@ Subscription.init(
       defaultValue: 0,
       field: 'cancel_attempts',
     },
+    endDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'end_date',
+    },
+    renewalDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'renewal_date',
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -98,6 +112,8 @@ Subscription.init(
       { fields: ['user_id'] },
       { fields: ['stripe_subscription_id'], unique: true },
       { fields: ['status'] },
+      { fields: ['end_date'] },
+      { fields: ['renewal_date'] },
     ],
   }
 );

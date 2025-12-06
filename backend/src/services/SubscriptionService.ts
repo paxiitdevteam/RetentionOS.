@@ -143,7 +143,9 @@ export async function createOrUpdateSubscription(
   userId: number,
   stripeSubscriptionId: string | null,
   value?: number,
-  status?: string
+  status?: string,
+  endDate?: Date | null,
+  renewalDate?: Date | null
 ): Promise<Subscription> {
   // Check if subscription exists for this user
   let subscription = await Subscription.findOne({ where: { userId } });
@@ -154,6 +156,8 @@ export async function createOrUpdateSubscription(
     if (stripeSubscriptionId) updates.stripeSubscriptionId = stripeSubscriptionId;
     if (value !== undefined) updates.value = value;
     if (status) updates.status = status;
+    if (endDate !== undefined) updates.endDate = endDate;
+    if (renewalDate !== undefined) updates.renewalDate = renewalDate;
 
     await subscription.update(updates);
     await subscription.reload();
@@ -165,6 +169,8 @@ export async function createOrUpdateSubscription(
       value: value || null,
       status: status || 'active',
       cancelAttempts: 0,
+      endDate: endDate || null,
+      renewalDate: renewalDate || null,
     });
   }
 

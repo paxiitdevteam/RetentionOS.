@@ -79,13 +79,30 @@ export async function handleSubscriptionUpdated(
 
     const status = statusMap[subscription.status] || subscription.status;
 
+    // Calculate end date and renewal date from Stripe subscription
+    const currentPeriodEnd = subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000)
+      : null;
+    const currentPeriodStart = subscription.current_period_start
+      ? new Date(subscription.current_period_start * 1000)
+      : null;
+
     // Create or update subscription
-    await createOrUpdateSubscription(
+    const dbSubscription = await createOrUpdateSubscription(
       user.id,
       subscription.id,
       value,
       status
     );
+
+    // Update end date and renewal date
+    if (currentPeriodEnd) {
+      await dbSubscription.update({ endDate: currentPeriodEnd });
+    }
+    if (currentPeriodStart) {
+      // Renewal date is typically the same as end date for monthly subscriptions
+      await dbSubscription.update({ renewalDate: currentPeriodEnd || currentPeriodStart });
+    }
 
     console.log(`✅ Subscription ${subscription.id} updated for user ${user.id}`);
   } catch (error: any) {

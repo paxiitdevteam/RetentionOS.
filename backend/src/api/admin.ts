@@ -1312,6 +1312,288 @@ function parseCSVToTemplates(csvText: string): any[] {
 }
 
 /**
+ * GET /admin/subscriptions/upcoming
+ * Get subscriptions expiring soon
+ * Requires authentication
+ */
+router.get('/subscriptions/upcoming', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const days = req.query.days ? parseInt(req.query.days as string) : 30;
+    const subscriptions = await getUpcomingSubscriptions(days);
+
+    res.json({
+      success: true,
+      subscriptions,
+      count: subscriptions.length,
+    });
+  } catch (error: any) {
+    console.error('Error getting upcoming subscriptions:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get upcoming subscriptions',
+    });
+  }
+});
+
+/**
+ * GET /admin/subscriptions/needing-retention
+ * Get subscriptions that need proactive retention
+ * Requires authentication
+ */
+router.get('/subscriptions/needing-retention', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const subscriptions = await getSubscriptionsNeedingRetention();
+
+    res.json({
+      success: true,
+      subscriptions,
+      count: subscriptions.length,
+    });
+  } catch (error: any) {
+    console.error('Error getting subscriptions needing retention:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get subscriptions needing retention',
+    });
+  }
+});
+
+/**
+ * GET /admin/subscriptions/stats
+ * Get subscription statistics
+ * Requires authentication
+ */
+router.get('/subscriptions/stats', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const stats = await getSubscriptionStats();
+
+    res.json({
+      success: true,
+      stats,
+    });
+  } catch (error: any) {
+    console.error('Error getting subscription stats:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get subscription stats',
+    });
+  }
+});
+
+/**
+ * POST /admin/subscriptions/check-alerts
+ * Check and send alerts for upcoming subscriptions
+ * Requires authentication
+ */
+router.post('/subscriptions/check-alerts', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const alertDays = req.body.alertDays || [30, 14, 7, 3, 1];
+    const alerts = await checkAndSendAlerts(alertDays);
+
+    res.json({
+      success: true,
+      alerts,
+      count: alerts.length,
+    });
+  } catch (error: any) {
+    console.error('Error checking alerts:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to check alerts',
+    });
+  }
+});
+
+/**
+ * POST /admin/subscriptions/trigger-retention
+ * Manually trigger proactive retention for subscriptions expiring soon
+ * Requires authentication
+ */
+router.post('/subscriptions/trigger-retention', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const daysBeforeEnd = req.body.daysBeforeEnd || 7;
+    const results = await triggerProactiveRetention(daysBeforeEnd);
+
+    res.json({
+      success: true,
+      results,
+      triggered: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
+    });
+  } catch (error: any) {
+    console.error('Error triggering proactive retention:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to trigger proactive retention',
+    });
+  }
+});
+
+/**
+ * GET /admin/alerts
+ * Get unread alerts for admin dashboard
+ * Requires authentication
+ */
+router.get('/alerts', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+    const alerts = await getUnreadAlerts(limit);
+
+    res.json({
+      success: true,
+      alerts,
+      count: alerts.length,
+    });
+  } catch (error: any) {
+    console.error('Error getting alerts:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get alerts',
+    });
+  }
+});
+
+/**
+ * GET /admin/alerts/stats
+ * Get alert statistics
+ * Requires authentication
+ */
+router.get('/alerts/stats', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const stats = await getAlertStats();
+
+    res.json({
+      success: true,
+      stats,
+    });
+  } catch (error: any) {
+    console.error('Error getting alert stats:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get alert stats',
+    });
+  }
+});
+
+/**
+ * PUT /admin/alerts/:id/read
+ * Mark alert as read
+ * Requires authentication
+ */
+router.put('/alerts/:id/read', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const alertId = parseInt(req.params.id);
+    const alert = await markAlertAsRead(alertId);
+
+    res.json({
+      success: true,
+      alert,
+    });
+  } catch (error: any) {
+    console.error('Error marking alert as read:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to mark alert as read',
+    });
+  }
+});
+
+/**
+ * PUT /admin/subscriptions/:id/alerts/read-all
+ * Mark all alerts as read for a subscription
+ * Requires authentication
+ */
+router.put('/subscriptions/:id/alerts/read-all', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const subscriptionId = parseInt(req.params.id);
+    const count = await markAllAlertsAsReadForSubscription(subscriptionId);
+
+    res.json({
+      success: true,
+      count,
+    });
+  } catch (error: any) {
+    console.error('Error marking alerts as read:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to mark alerts as read',
+    });
+  }
+});
+
+/**
  * POST /admin/flows/:id/activate
  * Activate flow (set ranking score > 0)
  * Requires authentication and admin role

@@ -516,6 +516,98 @@ class ApiClient {
     }>(`${PMS.getApiPath('/admin/flows/templates')}`);
   }
 
+  // Subscription Monitoring APIs
+  async getUpcomingSubscriptions(days: number = 30) {
+    return this.request<{
+      success: boolean;
+      subscriptions: any[];
+      count: number;
+    }>(`${PMS.getApiPath('/admin/subscriptions/upcoming')}?days=${days}`);
+  }
+
+  async getSubscriptionsNeedingRetention() {
+    return this.request<{
+      success: boolean;
+      subscriptions: any[];
+      count: number;
+    }>(PMS.getApiPath('/admin/subscriptions/needing-retention'));
+  }
+
+  async getSubscriptionStats() {
+    return this.request<{
+      success: boolean;
+      stats: {
+        totalActive: number;
+        expiringIn7Days: number;
+        expiringIn30Days: number;
+        expiringIn90Days: number;
+        totalValueAtRisk: number;
+        averageDaysUntilExpiration: number;
+      };
+    }>(PMS.getApiPath('/admin/subscriptions/stats'));
+  }
+
+  async checkAlerts(alertDays?: number[]) {
+    return this.request<{
+      success: boolean;
+      alerts: any[];
+      count: number;
+    }>(PMS.getApiPath('/admin/subscriptions/check-alerts'), {
+      method: 'POST',
+      body: JSON.stringify({ alertDays }),
+    });
+  }
+
+  async triggerProactiveRetention(daysBeforeEnd: number = 7) {
+    return this.request<{
+      success: boolean;
+      results: any[];
+      triggered: number;
+      failed: number;
+    }>(PMS.getApiPath('/admin/subscriptions/trigger-retention'), {
+      method: 'POST',
+      body: JSON.stringify({ daysBeforeEnd }),
+    });
+  }
+
+  async getAlerts(limit: number = 100) {
+    return this.request<{
+      success: boolean;
+      alerts: any[];
+      count: number;
+    }>(`${PMS.getApiPath('/admin/alerts')}?limit=${limit}`);
+  }
+
+  async getAlertStats() {
+    return this.request<{
+      success: boolean;
+      stats: {
+        total: number;
+        unread: number;
+        byType: Record<string, number>;
+        recent24Hours: number;
+      };
+    }>(PMS.getApiPath('/admin/alerts/stats'));
+  }
+
+  async markAlertAsRead(alertId: number) {
+    return this.request<{
+      success: boolean;
+      alert: any;
+    }>(PMS.getApiPath(`/admin/alerts/${alertId}/read`), {
+      method: 'PUT',
+    });
+  }
+
+  async markAllAlertsAsRead(subscriptionId: number) {
+    return this.request<{
+      success: boolean;
+      count: number;
+    }>(PMS.getApiPath(`/admin/subscriptions/${subscriptionId}/alerts/read-all`), {
+      method: 'PUT',
+    });
+  }
+
   async activateFlow(id: number) {
     return this.request<{
       success: boolean;
