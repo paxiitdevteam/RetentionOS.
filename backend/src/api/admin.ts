@@ -1841,5 +1841,122 @@ router.post('/flows/:id/deactivate', authenticate, requireAdmin, async (req: Req
   }
 });
 
+/**
+ * GET /admin/roi
+ * Get ROI metrics and calculations
+ * Requires authentication
+ */
+router.get('/roi', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const monthlyCost = req.query.monthlyCost
+      ? parseFloat(req.query.monthlyCost as string)
+      : 99; // Default to Growth plan
+    const days = req.query.days
+      ? parseInt(req.query.days as string)
+      : 30;
+
+    // Import dynamically to ensure module is loaded
+    const { calculateROI: calcROI } = await import('../services/ROIService');
+    const roiMetrics = await calcROI(monthlyCost, days);
+
+    res.json({
+      success: true,
+      metrics: roiMetrics,
+    });
+  } catch (error: any) {
+    console.error('Error calculating ROI:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to calculate ROI',
+    });
+  }
+});
+
+/**
+ * GET /admin/roi/trend
+ * Get ROI trend over time
+ * Requires authentication
+ */
+router.get('/roi/trend', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const monthlyCost = req.query.monthlyCost
+      ? parseFloat(req.query.monthlyCost as string)
+      : 99;
+    const days = req.query.days
+      ? parseInt(req.query.days as string)
+      : 30;
+
+    // Import dynamically to ensure module is loaded
+    const { getROITrend: getTrend } = await import('../services/ROIService');
+    const trendData = await getTrend(monthlyCost, days);
+
+    res.json({
+      success: true,
+      trend: trendData,
+    });
+  } catch (error: any) {
+    console.error('Error getting ROI trend:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get ROI trend',
+    });
+  }
+});
+
+/**
+ * GET /admin/roi/forecast
+ * Get revenue impact forecast
+ * Requires authentication
+ */
+router.get('/roi/forecast', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const monthlyCost = req.query.monthlyCost
+      ? parseFloat(req.query.monthlyCost as string)
+      : 99;
+    const forecastDays = req.query.days
+      ? parseInt(req.query.days as string)
+      : 90;
+
+    // Import dynamically to ensure module is loaded
+    const { getRevenueForecast: getForecast } = await import('../services/ROIService');
+    const forecast = await getForecast(monthlyCost, forecastDays);
+
+    res.json({
+      success: true,
+      forecast,
+    });
+  } catch (error: any) {
+    console.error('Error getting revenue forecast:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get revenue forecast',
+    });
+  }
+});
+
 export default router;
 
