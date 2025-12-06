@@ -1347,7 +1347,10 @@ router.get('/subscriptions/upcoming', authenticate, async (req: Request, res: Re
     }
 
     const days = req.query.days ? parseInt(req.query.days as string) : 30;
-    const subscriptions = await getUpcomingSubscriptions(days);
+    
+    // Import dynamically to ensure module is loaded
+    const { getUpcomingSubscriptions: getUpcoming } = await import('../services/SubscriptionMonitorService');
+    const subscriptions = await getUpcoming(days);
 
     res.json({
       success: true,
