@@ -37,6 +37,26 @@ import {
   generateTemplatesFromDatabase,
   loadTemplatesFromUrl,
 } from '../services/FlowService';
+import {
+  getUpcomingSubscriptions,
+  getSubscriptionsNeedingRetention,
+  checkAndSendAlerts,
+  triggerProactiveRetention,
+  getSubscriptionStats,
+} from '../services/SubscriptionMonitorService';
+import {
+  getAlertsForSubscription,
+  getAlertsForUser,
+  getUnreadAlerts,
+  markAlertAsRead,
+  markAllAlertsAsReadForSubscription,
+  getAlertStats,
+} from '../services/AlertService';
+import {
+  processAlertWithAI,
+  processPendingAlertsWithAI,
+} from '../services/AIAgentService';
+import { testEmailConfiguration } from '../services/EmailService';
 
 const router = Router();
 
