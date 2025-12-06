@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS alerts (
   message TEXT NOT NULL,
   metadata JSON,
   email_sent BOOLEAN DEFAULT false,
-  read BOOLEAN DEFAULT false,
+  `read` BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
