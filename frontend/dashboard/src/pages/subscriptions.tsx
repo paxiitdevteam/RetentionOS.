@@ -411,6 +411,54 @@ const Subscriptions: NextPage = () => {
           </>
         )}
 
+        {/* Trigger Retention Confirmation Modal */}
+        <Modal
+          isOpen={showTriggerConfirm}
+          onClose={() => {
+            setShowTriggerConfirm(false);
+            setTriggerResult(null);
+          }}
+          title="Trigger Proactive Retention"
+          maxWidth="400px"
+        >
+          {triggerResult ? (
+            <>
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '14px', color: '#1F9D55', marginBottom: '8px', fontWeight: 600 }}>
+                  ✅ Success!
+                </div>
+                <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
+                  Triggered {triggerResult.triggered} retention flows ({triggerResult.failed} failed)
+                </p>
+              </div>
+              <ModalActions>
+                <ModalButton variant="primary" onClick={() => {
+                  setShowTriggerConfirm(false);
+                  setTriggerResult(null);
+                }}>
+                  Close
+                </ModalButton>
+              </ModalActions>
+            </>
+          ) : (
+            <>
+              <div style={{ marginBottom: '20px' }}>
+                <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
+                  Trigger proactive retention for all subscriptions expiring in 7 days?
+                </p>
+              </div>
+              <ModalActions>
+                <ModalButton variant="secondary" onClick={() => setShowTriggerConfirm(false)}>
+                  Cancel
+                </ModalButton>
+                <ModalButton variant="primary" onClick={confirmTriggerRetention}>
+                  Trigger
+                </ModalButton>
+              </ModalActions>
+            </>
+          )}
+        </Modal>
+
         {/* Message Modal */}
         {showMessageModal && (
           <MessageModal
