@@ -61,7 +61,7 @@ npm install
 
 # Start root server
 npm start
-# or use the startup script (Git Bash)
+# or use the startup script (Git Bash - recommended)
 ./start.sh
 ```
 
@@ -151,7 +151,8 @@ All components use PMS for consistent path management and easy configuration.
 - MariaDB 10.5+ or MySQL 8.0+ (on NAS)
 - Redis 7+
 - Docker & Docker Compose (optional)
-- Git Bash (Windows) or Bash (Linux/macOS)
+- **Git Bash (Windows)** - Required for Windows, no PowerShell needed! ✅
+- Bash (Linux/macOS)
 
 ### Installation
 
