@@ -18,6 +18,7 @@ export const runMigrations = async (): Promise<void> => {
     const migrationFiles = [
       '001_initial_schema.sql',
       '002_add_subscription_dates_and_alerts.sql',
+      'create_alerts_table.sql', // Ensure alerts table is created
     ];
 
     for (const migrationFile of migrationFiles) {
