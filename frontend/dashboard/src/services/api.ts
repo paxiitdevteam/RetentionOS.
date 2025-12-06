@@ -144,6 +144,16 @@ class ApiClient {
     }>(PMS.getAdminPath('me'));
   }
 
+  async updatePassword(currentPassword: string, newPassword: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+    }>(PMS.getAdminPath('password'), {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  }
+
   // Analytics endpoints
   async getAnalyticsSummary() {
     return this.request<{

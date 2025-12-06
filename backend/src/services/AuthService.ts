@@ -227,6 +227,70 @@ export async function login(
 }
 
 /**
+ * Update admin password
+ * @param adminId Admin account ID
+ * @param currentPassword Current plain text password
+ * @param newPassword New plain text password
+ * @param ipAddress Client IP address
+ * @returns Updated admin account
+ */
+export async function updatePassword(
+  adminId: number,
+  currentPassword: string,
+  newPassword: string,
+  ipAddress: string
+): Promise<AdminAccount> {
+  // Validate new password strength (per security.md)
+  if (newPassword.length < 12) {
+    throw new Error('Password must be at least 12 characters');
+  }
+  
+  if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(newPassword)) {
+    throw new Error('Password must contain uppercase, lowercase, number, and special character');
+  }
+
+  // Get admin account
+  const admin = await AdminAccount.findByPk(adminId);
+  if (!admin) {
+    throw new Error('Admin account not found');
+  }
+
+  // Verify current password
+  const isValid = await bcrypt.compare(currentPassword, admin.passwordHash);
+  if (!isValid) {
+    // Log failed password change attempt
+    await AuditLog.create({
+      adminId: admin.id,
+      action: 'password_change_failed',
+      ip: ipAddress,
+      description: 'Failed password change attempt - incorrect current password',
+      beforeState: null,
+      afterState: { reason: 'invalid_current_password' },
+    });
+    throw new Error('Current password is incorrect');
+  }
+
+  // Hash new password
+  const newPasswordHash = await bcrypt.hash(newPassword, BCRYPT_COST);
+
+  // Update password
+  admin.passwordHash = newPasswordHash;
+  await admin.save();
+
+  // Log successful password change
+  await AuditLog.create({
+    adminId: admin.id,
+    action: 'password_changed',
+    ip: ipAddress,
+    description: 'Password changed successfully',
+    beforeState: null,
+    afterState: { email: admin.email },
+  });
+
+  return admin;
+}
+
+/**
  * Logout admin (invalidate session)
  * Note: With JWT, logout is client-side (delete token)
  * This function logs the logout event

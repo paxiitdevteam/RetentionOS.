@@ -28,6 +28,15 @@ const Settings: NextPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [newKey, setNewKey] = useState<{ key: string; id: number } | null>(null);
   const [showNewKey, setShowNewKey] = useState(false);
+  
+  // Password change state
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -82,6 +91,48 @@ const Settings: NextPage = () => {
     alert('Copied to clipboard!');
   };
 
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess(false);
+
+    // Validate passwords
+    if (newPassword.length < 12) {
+      setPasswordError('Password must be at least 12 characters');
+      return;
+    }
+
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(newPassword)) {
+      setPasswordError('Password must contain uppercase, lowercase, number, and special character');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setPasswordError('New password must be different from current password');
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      await apiClient.updatePassword(currentPassword, newPassword);
+      setPasswordSuccess(true);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowPasswordForm(false);
+      setTimeout(() => setPasswordSuccess(false), 5000);
+    } catch (err: any) {
+      setPasswordError(err.message || 'Failed to update password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return null;
   }
@@ -115,9 +166,193 @@ const Settings: NextPage = () => {
             <div style={{ marginBottom: '8px' }}>
               <strong>Email:</strong> {admin?.email}
             </div>
-            <div style={{ marginBottom: '8px' }}>
+            <div style={{ marginBottom: '16px' }}>
               <strong>Role:</strong> {admin?.role}
             </div>
+            
+            {passwordSuccess && (
+              <div
+                style={{
+                  background: '#e8f5e9',
+                  color: '#1F9D55',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  marginBottom: '16px',
+                  fontSize: '14px',
+                }}
+              >
+                ✅ Password updated successfully!
+              </div>
+            )}
+
+            {!showPasswordForm ? (
+              <button
+                onClick={() => setShowPasswordForm(true)}
+                style={{
+                  padding: '10px 20px',
+                  background: '#003A78',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}
+              >
+                Change Password
+              </button>
+            ) : (
+              <form onSubmit={handlePasswordChange} style={{ marginTop: '16px' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: '#333',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Current Password
+                  </label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box',
+                    }}
+                    placeholder="Enter current password"
+                  />
+                </div>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: '#333',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box',
+                    }}
+                    placeholder="Enter new password (min 12 chars)"
+                  />
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    Must contain: uppercase, lowercase, number, and special character
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: '#333',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box',
+                    }}
+                    placeholder="Confirm new password"
+                  />
+                </div>
+
+                {passwordError && (
+                  <div
+                    style={{
+                      background: '#fee',
+                      color: '#c33',
+                      padding: '12px',
+                      borderRadius: '6px',
+                      marginBottom: '16px',
+                      fontSize: '14px',
+                    }}
+                  >
+                    {passwordError}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="submit"
+                    disabled={passwordLoading}
+                    style={{
+                      padding: '10px 20px',
+                      background: passwordLoading ? '#ccc' : '#003A78',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      cursor: passwordLoading ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {passwordLoading ? 'Updating...' : 'Update Password'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPasswordForm(false);
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmPassword('');
+                      setPasswordError('');
+                    }}
+                    style={{
+                      padding: '10px 20px',
+                      background: 'transparent',
+                      color: '#666',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 

@@ -4,7 +4,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { login, logout } from '../services/AuthService';
+import { login, logout, updatePassword } from '../services/AuthService';
 import { authenticate, requireAdmin } from '../middleware/auth';
 import {
   generateApiKey,
@@ -191,6 +191,79 @@ router.get('/me', authenticate, async (req: Request, res: Response) => {
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message || 'Failed to get admin info',
+    });
+  }
+});
+
+/**
+ * PUT /admin/password
+ * Update admin password
+ * Requires authentication
+ */
+router.put('/password', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'Current password and new password are required',
+      });
+      return;
+    }
+
+    // Get client info for audit logging
+    const ipAddress = req.ip || (Array.isArray(req.headers['x-forwarded-for']) 
+      ? req.headers['x-forwarded-for'][0] 
+      : req.headers['x-forwarded-for']) || 'unknown';
+
+    // Update password
+    await updatePassword(req.admin.adminId, currentPassword, newPassword, ipAddress as string);
+
+    res.json({
+      success: true,
+      message: 'Password updated successfully',
+    });
+  } catch (error: any) {
+    // Check if it's a database connection error
+    if (error.name === 'SequelizeConnectionError' || 
+        error.message?.includes('SSPI') || 
+        error.message?.includes('connection') ||
+        error.message?.includes('auth_gssapi_client') ||
+        error.message?.includes('Database connection failed')) {
+      console.error('Database connection error during password update:', error);
+      const originalError = (error as any).originalError || error;
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Database connection failed. Please check database configuration and ensure the database is running.',
+        details: process.env.NODE_ENV === 'development' ? originalError.message : undefined,
+      });
+      return;
+    }
+
+    // For validation errors (wrong password, weak password, etc.), return 400
+    if (error.message?.includes('Current password') || 
+        error.message?.includes('Password must')) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: error.message || 'Password update failed',
+      });
+      return;
+    }
+
+    // For other errors, return 500
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to update password',
     });
   }
 });
