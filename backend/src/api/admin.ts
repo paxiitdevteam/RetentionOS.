@@ -1510,7 +1510,9 @@ router.get('/alerts', authenticate, async (req: Request, res: Response) => {
     }
 
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
-    const alerts = await getUnreadAlerts(limit);
+    // Import dynamically to ensure module is loaded
+    const { getUnreadAlerts: getUnread } = await import('../services/AlertService');
+    const alerts = await getUnread(limit);
 
     res.json({
       success: true,
