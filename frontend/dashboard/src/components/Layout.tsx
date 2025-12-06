@@ -60,7 +60,7 @@ export default function Layout({ children }: LayoutProps) {
           <NavLink href="/roi" label="ROI Calculator" icon="💰" />
           <NavLink href="/subscriptions" label="Subscriptions" icon="💳" />
           <NavLink href="/flows" label="Flows" icon="🔄" />
-          <NavLink href="/ai" label="AI Agent" icon="🤖" />
+          <NavLink href="/ai" label="AI Automation" icon="🤖" />
           <NavLink href="/settings" label="Settings" icon="⚙️" />
         </nav>
 
@@ -120,7 +120,7 @@ export default function Layout({ children }: LayoutProps) {
                 {router.pathname === '/subscriptions' && 'Subscriptions'}
                 {router.pathname === '/flows' && 'Retention Flows'}
                 {router.pathname === '/flows/builder' && 'Flow Builder'}
-                {router.pathname === '/ai' && 'AI Agent'}
+                {router.pathname === '/ai' && 'AI Automation'}
                 {router.pathname === '/settings' && 'Settings'}
               </h2>
             </div>

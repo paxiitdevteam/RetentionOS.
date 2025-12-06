@@ -137,15 +137,20 @@ const AIPage: NextPage = () => {
   return (
     <Layout>
       <Head>
-        <title>AI Agent - RetentionOS</title>
-        <meta name="description" content="AI Agent activity, email logs, and performance monitoring" />
+        <title>AI Automation - RetentionOS</title>
+        <meta name="description" content="AI automation activity, email logs, and performance monitoring" />
       </Head>
 
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#003A78', margin: 0 }}>
-            🤖 AI Agent
-          </h1>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#003A78', margin: 0, marginBottom: '8px' }}>
+              🤖 AI Automation
+            </h1>
+            <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
+              Automated monitoring, email alerts, and retention flow triggers
+            </p>
+          </div>
           <button
             onClick={handleProcessPending}
             disabled={processing}
@@ -307,7 +312,7 @@ const AIPage: NextPage = () => {
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
               {activity.length === 0 ? (
                 <div style={{ padding: '40px', textAlign: 'center', color: '#999' }}>
-                  No activity yet. AI agent will process alerts automatically when subscriptions expire.
+                  No activity yet. AI automation will process alerts automatically when subscriptions expire.
                 </div>
               ) : (
                 activity.map((item) => (
@@ -380,7 +385,7 @@ const AIPage: NextPage = () => {
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
               {emailLogs.length === 0 ? (
                 <div style={{ padding: '40px', textAlign: 'center', color: '#999' }}>
-                  No emails sent yet. AI agent will send emails automatically when processing alerts.
+                  No emails sent yet. AI automation will send emails automatically when processing alerts.
                 </div>
               ) : (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -438,10 +443,10 @@ const AIPage: NextPage = () => {
           <div>
             <div style={{ background: 'white', padding: '24px', borderRadius: '8px', border: '1px solid #e0e0e0', marginBottom: '24px' }}>
               <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#003A78', marginBottom: '16px' }}>
-                AI Agent Performance Overview
+                Automation Performance Overview
               </h2>
               <p style={{ fontSize: '14px', color: '#666', marginBottom: '24px' }}>
-                The AI agent automatically monitors subscriptions, sends personalized emails, and triggers retention flows.
+                AI automation automatically monitors subscriptions, sends personalized emails, and triggers retention flows.
                 All actions are logged and visible here for complete transparency.
               </p>
               {stats && (
