@@ -9,8 +9,9 @@ RUN apk add --no-cache dumb-init
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci && npm cache clean --force
+# Install dependencies (use npm install since package-lock.json may not exist)
+# If package-lock.json exists, it will be used; otherwise npm install will work
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi && npm cache clean --force
 
 # Copy application files
 COPY . .
