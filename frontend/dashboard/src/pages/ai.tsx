@@ -59,6 +59,7 @@ const AIPage: NextPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState<{ type: 'success' | 'error'; title: string; message: string } | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -480,6 +481,17 @@ const AIPage: NextPage = () => {
               )}
             </div>
           </div>
+        )}
+
+        {/* Message Modal */}
+        {showMessageModal && (
+          <MessageModal
+            isOpen={!!showMessageModal}
+            onClose={() => setShowMessageModal(null)}
+            type={showMessageModal.type}
+            title={showMessageModal.title}
+            message={showMessageModal.message}
+          />
         )}
       </div>
     </Layout>
