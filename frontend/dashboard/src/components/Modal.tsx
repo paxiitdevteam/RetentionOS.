@@ -40,6 +40,8 @@ export default function Modal({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10000,
+        padding: '20px',
+        boxSizing: 'border-box',
       }}
       onClick={onClose}
     >
@@ -51,10 +53,11 @@ export default function Modal({
           border: '1px solid #e0e0e0',
           padding: '24px',
           maxWidth: maxWidth,
-          width: '90%',
-          maxHeight: '90vh',
+          width: '100%',
+          maxHeight: 'calc(100vh - 40px)',
           overflow: 'auto',
           boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
