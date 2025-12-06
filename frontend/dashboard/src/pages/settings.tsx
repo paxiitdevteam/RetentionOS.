@@ -75,15 +75,19 @@ const Settings: NextPage = () => {
   };
 
   const handleDeleteKey = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
-      return;
-    }
+    setShowDeleteConfirm(id);
+  };
+
+  const confirmDeleteKey = async () => {
+    if (!showDeleteConfirm) return;
 
     try {
-      await apiClient.deleteApiKey(id);
+      await apiClient.deleteApiKey(showDeleteConfirm);
       await loadApiKeys();
+      setShowDeleteConfirm(null);
     } catch (err: any) {
       alert(err.message || 'Failed to delete API key');
+      setShowDeleteConfirm(null);
     }
   };
 
