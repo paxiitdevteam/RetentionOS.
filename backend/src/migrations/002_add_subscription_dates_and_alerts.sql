@@ -38,6 +38,8 @@ EXECUTE alterIfNotExists;
 DEALLOCATE PREPARE alterIfNotExists;
 
 -- Create alerts table for subscription lifecycle alerts
+-- Note: This is also in create_alerts_table.sql, but kept here for completeness
+-- The migration runner will skip if table already exists
 CREATE TABLE IF NOT EXISTS alerts (
   id INT AUTO_INCREMENT PRIMARY KEY,
   subscription_id INT NOT NULL,
@@ -48,6 +50,7 @@ CREATE TABLE IF NOT EXISTS alerts (
   email_sent BOOLEAN DEFAULT false,
   `read` BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   INDEX idx_alerts_subscription_id (subscription_id),
