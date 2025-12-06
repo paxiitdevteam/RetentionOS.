@@ -392,7 +392,17 @@ const ROI: NextPage = () => {
                       tick={{ fontSize: 12 }}
                       tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     />
-                    <YAxis tick={{ fontSize: 12 }} />
+                    <YAxis
+                      yAxisId={0}
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => formatCurrency(value)}
+                    />
+                    <YAxis
+                      yAxisId={1}
+                      orientation="right"
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => formatPercentage(value)}
+                    />
                     <Tooltip
                       formatter={(value: any, name: string) => {
                         if (name === 'projectedRevenue') return formatCurrency(value);
@@ -408,6 +418,7 @@ const ROI: NextPage = () => {
                       stroke="#1F9D55"
                       strokeWidth={2}
                       name="Cumulative Revenue Saved"
+                      yAxisId={0}
                     />
                     <Line
                       type="monotone"
