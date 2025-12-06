@@ -57,6 +57,11 @@ import {
   processPendingAlertsWithAI,
 } from '../services/AIAgentService';
 import { testEmailConfiguration } from '../services/EmailService';
+import {
+  calculateROI,
+  getROITrend,
+  getRevenueForecast,
+} from '../services/ROIService';
 
 const router = Router();
 

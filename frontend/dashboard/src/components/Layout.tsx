@@ -56,6 +56,7 @@ export default function Layout({ children }: LayoutProps) {
 
         <nav style={{ flex: 1 }}>
           <NavLink href="/" label="Overview" icon="📊" />
+          <NavLink href="/roi" label="ROI Calculator" icon="💰" />
           <NavLink href="/subscriptions" label="Subscriptions" icon="💳" />
           <NavLink href="/analytics" label="Analytics" icon="📈" />
           <NavLink href="/flows" label="Flows" icon="🔄" />
@@ -114,6 +115,7 @@ export default function Layout({ children }: LayoutProps) {
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>
                 {router.pathname === '/' && 'Dashboard Overview'}
+                {router.pathname === '/roi' && 'ROI Calculator'}
                 {router.pathname === '/subscriptions' && 'Subscription Monitoring'}
                 {router.pathname === '/analytics' && 'Analytics'}
                 {router.pathname === '/flows' && 'Retention Flows'}
