@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Integrate RetentionOS | Integration Guide</title>
+    <meta name="description" content="Learn how to integrate RetentionOS into your SaaS platform. Simple 5-minute setup with our widget SDK.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" id="favicon-link">
+    <script src="pms.js"></script>
+</head>
+<body>
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">How to Integrate RetentionOS</h1>
+                <p class="hero-subtitle" style="font-size: 1.5rem; margin-bottom: 2rem;">
+                    Simple 5-minute setup. One script tag. Start saving revenue today.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integration Model Section -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">
+                    RetentionOS uses a hybrid model: Sign up like Salesforce/Jira, integrate like Stripe/Intercom.
+                </p>
+            </div>
+            <div class="grid grid-3">
+                <div class="card" style="border-top: 4px solid var(--accent-purple);">
+                    <div class="card-icon" style="color: var(--accent-purple); font-size: 3rem;">1️⃣</div>
+                    <h3 class="card-title">Sign Up & Get API Key</h3>
+                    <p class="card-text">
+                        Create your RetentionOS account (like Salesforce or Jira). Get your API key from the dashboard settings. Takes 2 minutes.
+                    </p>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--accent-orange);">
+                    <div class="card-icon" style="color: var(--accent-orange); font-size: 3rem;">2️⃣</div>
+                    <h3 class="card-title">Add Widget Script</h3>
+                    <p class="card-text">
+                        Add one JavaScript snippet to your platform (like Stripe or Intercom). The widget automatically detects cancel button clicks.
+                    </p>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--accent-teal);">
+                    <div class="card-icon" style="color: var(--accent-teal); font-size: 3rem;">3️⃣</div>
+                    <h3 class="card-title">Configure Flows</h3>
+                    <p class="card-text">
+                        Design retention flows in the dashboard (like Salesforce). Set up pause, downgrade, discount, and support steps.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">5-Minute Quick Start</h2>
+                <p class="section-subtitle">
+                    Get RetentionOS running on your platform in minutes.
+                </p>
+            </div>
+            
+            <div style="background: var(--bg-white); padding: 3rem; border-radius: 16px; box-shadow: var(--shadow-lg); margin-top: 2rem;">
+                <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-dark);">Step 1: Get Your API Key</h3>
+                <p style="color: var(--text-gray); margin-bottom: 2rem; line-height: 1.8;">
+                    After signing up, go to Settings → API Keys in your dashboard. Click "Generate New API Key" and copy it.
+                </p>
+
+                <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-dark); margin-top: 3rem;">Step 2: Add Widget Script</h3>
+                <p style="color: var(--text-gray); margin-bottom: 1.5rem; line-height: 1.8;">
+                    Add this code before the closing <code>&lt;/body&gt;</code> tag on pages where users can cancel:
+                </p>
+                
+                <div style="background: #1a1a1a; padding: 2rem; border-radius: 12px; overflow-x: auto; margin-bottom: 2rem;">
+                    <pre style="color: #f8f8f2; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6; margin: 0;"><code>&lt;script src="https://cdn.retentionos.com/widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  RetentionOS.init({
+    apiKey: 'ros_live_your_api_key_here',
+    userId: '{{current_user_id}}',
+    plan: '{{user_plan}}',
+    region: '{{user_region}}'
+  });
+&lt;/script&gt;</code></pre>
+                </div>
+
+                <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-dark); margin-top: 3rem;">Step 3: Replace Placeholders</h3>
+                <ul style="color: var(--text-gray); line-height: 1.8; margin-left: 2rem; margin-bottom: 2rem;">
+                    <li><code>ros_live_your_api_key_here</code> → Your API key from dashboard</li>
+                    <li><code>{{current_user_id}}</code> → Current user's ID in your system</li>
+                    <li><code>{{user_plan}}</code> → User's subscription plan (e.g., 'pro', 'basic')</li>
+                    <li><code>{{user_region}}</code> → User's region code (e.g., 'us', 'eu')</li>
+                </ul>
+
+                <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-dark); margin-top: 3rem;">Step 4: Create Your First Flow</h3>
+                <p style="color: var(--text-gray); margin-bottom: 2rem; line-height: 1.8;">
+                    Go to Flows in your dashboard. Create a new flow with steps like "Pause Subscription", "Downgrade to Basic", or "20% Discount". The widget will automatically use this flow when users click cancel.
+                </p>
+
+                <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--success-green); margin-top: 2rem;">
+                    <p style="margin: 0; color: var(--text-dark); font-weight: 600;">✅ That's it! The widget will automatically detect cancel button clicks and show your retention flow.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integration Examples Section -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Integration Examples</h2>
+                <p class="section-subtitle">
+                    See how to integrate RetentionOS with popular platforms.
+                </p>
+            </div>
+            
+            <div class="grid grid-2" style="margin-top: 3rem;">
+                <div class="card" style="border-top: 4px solid var(--accent-indigo);">
+                    <h3 class="card-title">Simple HTML/JavaScript</h3>
+                    <div style="background: #1a1a1a; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; overflow-x: auto;">
+                        <pre style="color: #f8f8f2; font-size: 0.85rem; margin: 0;"><code>&lt;script src="https://cdn.retentionos.com/widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  RetentionOS.init({
+    apiKey: 'ros_live_...',
+    userId: 'user_123',
+    plan: 'pro',
+    region: 'us'
+  });
+&lt;/script&gt;</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-pink);">
+                    <h3 class="card-title">React Application</h3>
+                    <div style="background: #1a1a1a; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; overflow-x: auto;">
+                        <pre style="color: #f8f8f2; font-size: 0.85rem; margin: 0;"><code>useEffect(() => {
+  const script = document.createElement('script');
+  script.src = 'https://cdn.retentionos.com/widget.js';
+  script.onload = () => {
+    window.RetentionOS.init({
+      apiKey: process.env.REACT_APP_RETENTIONOS_API_KEY,
+      userId: user.id,
+      plan: user.plan,
+      region: user.region
+    });
+  };
+  document.body.appendChild(script);
+}, [user]);</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Flow -->
+    <section class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" style="color: white;">How It Works (Technical Flow)</h2>
+                <p class="section-subtitle" style="color: rgba(255, 255, 255, 0.9);">
+                    From cancel click to saved revenue in 8 steps.
+                </p>
+            </div>
+            
+            <div style="margin-top: 3rem;">
+                <div style="display: grid; gap: 2rem;">
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--accent-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">1</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">User Clicks Cancel</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">User clicks "Cancel Subscription" button on your platform.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--accent-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">2</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">Widget Detects Click</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">RetentionOS widget automatically detects the cancel button click.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--accent-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">3</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">Widget Calls API</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">Widget sends request to RetentionOS API with user info.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--accent-indigo); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">4</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">Backend Returns Flow</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">RetentionOS returns the appropriate retention flow (pause, downgrade, discount).</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--accent-pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">5</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">Widget Shows Modal</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">Beautiful modal displays retention options to the user.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--success-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">6</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">User Makes Decision</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">User accepts offer (pause/downgrade/discount) or continues cancellation.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">7</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">Backend Processes</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">If accepted, RetentionOS updates Stripe subscription and logs event.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--accent-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">8</div>
+                        <div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">Analytics Update</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">Dashboard shows saved revenue, saved users, and churn insights.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section section-light">
+        <div class="container">
+            <div style="text-align: center; padding: 4rem 2rem; background: var(--bg-white); border-radius: 16px; box-shadow: var(--shadow-lg);">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-dark);">Ready to Start?</h2>
+                <p style="font-size: 1.25rem; color: var(--text-gray); margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    Get your API key and start saving revenue in 5 minutes.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="#" id="ctaTrialLink" class="btn btn-large btn-success">Start Free</a>
+                    <a href="contact.html" class="btn btn-large btn-outline">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="components.js"></script>
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="components.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

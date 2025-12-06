@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Choose the perfect plan for your business. Simple, transparent pricing with no hidden fees.">
+    <title>Pricing - RetentionOS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="pms.js"></script>
+</head>
+<body>
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Simple plans. Predictable cost. No revenue share.</h1>
+                <p class="hero-subtitle">
+                    RetentionOS protects your revenue at a price built for real SaaS teams.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Pricing Matters -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">Why Pricing Matters</h2>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    SaaS founders dislike high fixed fees.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    Founders avoid revenue share.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    AI features must feel useful, not expensive.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    RetentionOS follows these rules.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8;">
+                    Low entry. Clear limits. Strong value.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Plans -->
+    <section class="section">
+        <div class="container">
+            <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                <!-- Free Tier -->
+                <div class="pricing-card" style="border-top: 4px solid var(--accent-purple);">
+                    <h3 class="pricing-name">Free Tier</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount" style="font-size: 3.5rem;">$0</span>
+                    </div>
+                    <p class="pricing-desc" style="font-weight: 600; margin-bottom: 1rem;">Let new SaaS teams test retention before paying. Supports app development through usage.</p>
+                    <ul class="pricing-features">
+                        <li>Cancel interceptor</li>
+                        <li>Basic retention modal</li>
+                        <li>One active flow</li>
+                        <li>Basic analytics</li>
+                        <li>100 cancel events each month</li>
+                        <li>Team access: Maximum 5 team members</li>
+                        <li>Email support</li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.9rem; color: var(--text-gray); font-weight: 600;">Who uses this:</p>
+                        <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">Small teams (max 5 persons). Beta products. Early founders testing ideas. SaaS owners starting their retention journey.</p>
+                    </div>
+                    <a href="#" class="btn btn-primary btn-block" style="margin-top: 1.5rem;" id="pricingFreeBtn">Start Free</a>
+                </div>
+
+                <!-- Growth -->
+                <div class="pricing-card" style="border-top: 4px solid var(--accent-orange);">
+                    <h3 class="pricing-name">Growth</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount" style="font-size: 3.5rem;">$29</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <p class="pricing-desc" style="font-weight: 600; margin-bottom: 1rem;">Everything in Free, plus:</p>
+                    <ul class="pricing-features">
+                        <li>Unlimited cancel events</li>
+                        <li>Full analytics</li>
+                        <li>Flow builder</li>
+                        <li>Three active flows</li>
+                        <li>Basic AI offer ranking</li>
+                        <li>Stripe integration</li>
+                        <li>Team access for two members</li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.9rem; color: var(--text-gray); font-weight: 600;">Who uses this:</p>
+                        <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">SaaS platforms from 1K to 20K monthly revenue. Teams that want stability and retention insights.</p>
+                    </div>
+                    <a href="#" class="btn btn-primary btn-block" style="margin-top: 1.5rem;" id="pricingGrowthBtn">Get Started</a>
+                </div>
+
+                <!-- Pro -->
+                <div class="pricing-card pricing-featured" style="border-top: 4px solid var(--accent-teal);">
+                    <div class="pricing-badge">Most Popular</div>
+                    <h3 class="pricing-name">Pro</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount" style="font-size: 3.5rem;">$79</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <p class="pricing-desc" style="font-weight: 600; margin-bottom: 1rem;">Everything in Growth, plus:</p>
+                    <ul class="pricing-features">
+                        <li>Advanced AI suggestions</li>
+                        <li>Churn risk scoring</li>
+                        <li>Offer performance dashboards</li>
+                        <li>Multi-language flows</li>
+                        <li>Slack alerts</li>
+                        <li>Team access for five members</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.9rem; color: var(--text-gray); font-weight: 600;">Who uses this:</p>
+                        <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">Teams with growing subscriptions that want deeper insight.</p>
+                    </div>
+                    <a href="#" class="btn btn-success btn-block" style="margin-top: 1.5rem;" id="pricingProBtn">Get Started</a>
+                </div>
+
+                <!-- Scale -->
+                <div class="pricing-card" style="border-top: 4px solid var(--accent-indigo);">
+                    <h3 class="pricing-name">Scale</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount" style="font-size: 3.5rem;">$149</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <p class="pricing-desc" style="font-weight: 600; margin-bottom: 1rem;">Everything in Pro, plus:</p>
+                    <ul class="pricing-features">
+                        <li>Unlimited flows</li>
+                        <li>Agency mode</li>
+                        <li>Custom branding</li>
+                        <li>Dedicated success channel</li>
+                        <li>API expansion</li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.9rem; color: var(--text-gray); font-weight: 600;">Who uses this:</p>
+                        <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">Platforms above 30K monthly revenue. Agencies managing many clients.</p>
+                    </div>
+                    <a href="#" class="btn btn-primary btn-block" style="margin-top: 1.5rem;" id="pricingScaleBtn">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why SaaS Founders Accept This Pricing -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">Why SaaS Founders Accept This Pricing</h2>
+                <div class="grid grid-2" style="margin-top: 2rem;">
+                    <div class="card" style="border-top: 4px solid var(--accent-purple);">
+                        <ul class="feature-list" style="text-align: left;">
+                            <li>Low entry point</li>
+                            <li>No penalties</li>
+                            <li>Clear upgrades</li>
+                            <li>AI that supports decisions without high cost</li>
+                            <li>Pricing scales with team needs, not revenue</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why AI Features Attract Founders -->
+    <section class="section">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">Why AI Features Attract Founders</h2>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    AI gives simple guidance.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    AI ranks offers.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    AI finds patterns in churn.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    AI helps founders save money fast.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    AI becomes stronger as data grows.
+                </p>
+                <p class="about-text" style="font-size: 1.1rem; line-height: 1.8;">
+                    Founders feel they gain value without extra fees.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-dark">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Start Free</h2>
+                <p class="cta-subtitle">Upgrade when your retention grows.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-large btn-success" id="ctaTrialLink">Start Free</a>
+                    <a href="features.html" class="btn btn-large btn-outline-light">View Features</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="components.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetentionOS - Project Status</title>
+    <title>RetentionOS - Project Status Dashboard</title>
+    <meta name="description" content="RetentionOS Project Development Status - Track progress of all development phases">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -176,6 +178,35 @@
             opacity: 0.9;
             text-transform: uppercase;
         }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .auto-refresh {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 12px;
+            color: #666;
+        }
+        .auto-refresh .status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1F9D55;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
@@ -194,6 +225,10 @@
             <div class="stat-box">
                 <div class="number">2</div>
                 <div class="label">Phases Complete</div>
+            </div>
+            <div class="stat-box">
+                <div class="number">10</div>
+                <div class="label">Total Phases</div>
             </div>
             <div class="stat-box">
                 <div class="number">15%</div>
@@ -228,6 +263,38 @@
                     <span>Phase 2.4: Core Services</span>
                     <span class="status-badge badge-pending">⏳ Pending</span>
                 </div>
+                <div class="status-item">
+                    <span>Phase 3: Widget + Backend</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
+                <div class="status-item">
+                    <span>Phase 4: Analytics Engine</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
+                <div class="status-item">
+                    <span>Phase 5: Dashboard Integration</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
+                <div class="status-item">
+                    <span>Phase 6: Flow Builder (MVP)</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
+                <div class="status-item">
+                    <span>Phase 7: AI Integration</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
+                <div class="status-item">
+                    <span>Phase 8: Frontend UI (Final)</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
+                <div class="status-item">
+                    <span>Phase 9: Deployment</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
+                <div class="status-item">
+                    <span>Phase 10: Marketing Website</span>
+                    <span class="status-badge badge-pending">⏳ Pending</span>
+                </div>
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: 15%"></div>
                 </div>
@@ -260,8 +327,12 @@
             <div class="card">
                 <h2>Backend Status</h2>
                 <div class="status-item">
-                    <span>Server Setup</span>
-                    <span class="status-badge badge-complete">✅ Done</span>
+                    <span>Root Server</span>
+                    <span class="status-badge badge-complete">✅ Port 8000</span>
+                </div>
+                <div class="status-item">
+                    <span>Backend API</span>
+                    <span class="status-badge badge-pending">⏳ Port 3000</span>
                 </div>
                 <div class="status-item">
                     <span>Database Models</span>
@@ -278,6 +349,26 @@
                 <div class="status-item">
                     <span>Services</span>
                     <span class="status-badge badge-pending">⏳ 0/10</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Path Manager System (PMS)</h2>
+                <div class="status-item">
+                    <span>Backend PMS</span>
+                    <span class="status-badge badge-complete">✅ Implemented</span>
+                </div>
+                <div class="status-item">
+                    <span>Dashboard PMS</span>
+                    <span class="status-badge badge-complete">✅ Implemented</span>
+                </div>
+                <div class="status-item">
+                    <span>Widget PMS</span>
+                    <span class="status-badge badge-complete">✅ Implemented</span>
+                </div>
+                <div class="status-item">
+                    <span>PMS Version</span>
+                    <span style="font-weight: 600;">1.0.0</span>
                 </div>
             </div>
         </div>
@@ -306,6 +397,28 @@
                 <li>⏳ Session management (HTTP-only cookies)</li>
                 <li>⏳ Refresh token logic (MFA only)</li>
             </ul>
+        </div>
+
+        <div class="section">
+            <h2>🌐 Phase 10: Marketing Website (Can Run Parallel)</h2>
+            <p style="margin-bottom: 15px; color: #666;">The marketing website can be developed in parallel with other phases. All content and design specifications are ready in <code>docs/complete-specification.md</code>.</p>
+            <ul class="file-list">
+                <li>⏳ Create Next.js marketing site</li>
+                <li>⏳ Implement hero section with headline and CTA</li>
+                <li>⏳ Build problem section (users cancel, founders lose revenue)</li>
+                <li>⏳ Build solution section (pause, downgrade, discount, support flows)</li>
+                <li>⏳ Create features section (cancel interceptor, custom flows, AI, analytics)</li>
+                <li>⏳ Build "Why Founders Trust This" section</li>
+                <li>⏳ Create dashboard preview section</li>
+                <li>⏳ Build pricing section (clear monthly plans, zero revenue share)</li>
+                <li>⏳ Add testimonials section</li>
+                <li>⏳ Apply brand colors (#003A78, #1F9D55) and Inter font</li>
+                <li>⏳ Make responsive design</li>
+                <li>⏳ Deploy to production with custom domain</li>
+            </ul>
+            <p style="margin-top: 15px; padding: 15px; background: #F5F5F5; border-radius: 6px; font-size: 14px;">
+                <strong>📋 Content Ready:</strong> All marketing copy, sections, and design specifications are documented in <code>docs/complete-specification.md</code> (Marketing Website Copy section).
+            </p>
         </div>
 
         <div class="section">
@@ -358,6 +471,186 @@
             </ul>
         </div>
     </div>
+
+    <div class="auto-refresh">
+        <span class="status"></span>
+        <span id="refresh-status">Auto-updating...</span>
+    </div>
+
+    <script>
+        // Try root server proxy first, fallback to direct backend
+        const API_URL = window.location.origin + '/api/status';
+        const FALLBACK_URL = 'http://localhost:3000/status';
+        const REFRESH_INTERVAL = 30000; // 30 seconds
+
+        async function fetchStatus() {
+            try {
+                let response = null;
+                let data = null;
+                
+                // Try root server proxy first
+                try {
+                    response = await Promise.race([
+                        fetch(API_URL),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+                    ]);
+                    if (response && response.ok) {
+                        data = await response.json();
+                    }
+                } catch (proxyError) {
+                    // Silently fail and try direct backend
+                }
+                
+                // Fallback to direct backend if proxy fails
+                if (!data || !data.success) {
+                    try {
+                        response = await Promise.race([
+                            fetch(FALLBACK_URL),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+                        ]);
+                        if (response && response.ok) {
+                            data = await response.json();
+                        }
+                    } catch (backendError) {
+                        // Backend not available - this is expected if backend isn't running
+                    }
+                }
+                
+                if (data && data.success) {
+                    updateStatusPage(data);
+                    document.getElementById('refresh-status').textContent = 
+                        `Last updated: ${new Date(data.timestamp).toLocaleTimeString()}`;
+                    document.getElementById('refresh-status').style.color = '#1F9D55';
+                } else {
+                    // Backend not available - show friendly message
+                    document.getElementById('refresh-status').textContent = 
+                        'Backend offline - Start backend with: cd backend && npm run dev';
+                    document.getElementById('refresh-status').style.color = '#F0AD4E';
+                }
+            } catch (error) {
+                // Suppress all expected errors (timeouts, connection refused, network errors)
+                // Only log truly unexpected errors
+                const expectedErrors = ['Timeout', 'ConnectionRefused', 'Failed to fetch', 'NetworkError', 'Network request failed'];
+                const isExpectedError = expectedErrors.some(err => 
+                    error.message && error.message.includes(err)
+                );
+                
+                if (!isExpectedError && error.name !== 'TypeError') {
+                    console.error('Unexpected error fetching status:', error);
+                }
+                
+                document.getElementById('refresh-status').textContent = 
+                    'Backend offline - Start: cd backend && npm run dev';
+                document.getElementById('refresh-status').style.color = '#F0AD4E';
+            }
+        }
+
+        function updateStatusPage(data) {
+            // Update progress bar
+            const progressFill = document.querySelector('.progress-fill');
+            if (progressFill) {
+                progressFill.style.width = `${data.progress.percent}%`;
+            }
+
+            // Update stats
+            const statNumbers = document.querySelectorAll('.stat-box .number');
+            if (statNumbers.length >= 4) {
+                statNumbers[0].textContent = data.stats.databaseModels;
+                statNumbers[1].textContent = data.stats.phasesComplete;
+                statNumbers[2].textContent = data.stats.overallProgress;
+                statNumbers[3].textContent = data.stats.database;
+            }
+
+            // Update phase statuses
+            const phaseItems = document.querySelectorAll('.status-item');
+            phaseItems.forEach(item => {
+                const phaseName = item.querySelector('span:first-child')?.textContent.trim();
+                if (phaseName && data.progress.phases[phaseName]) {
+                    const status = data.progress.phases[phaseName];
+                    const badge = item.querySelector('.status-badge');
+                    if (badge) {
+                        if (status === 'completed') {
+                            badge.className = 'status-badge badge-complete';
+                            badge.textContent = '✅ Complete';
+                        } else if (status === 'in_progress') {
+                            badge.className = 'status-badge badge-in-progress';
+                            badge.textContent = '🔄 In Progress';
+                        } else {
+                            badge.className = 'status-badge badge-pending';
+                            badge.textContent = '⏳ Pending';
+                        }
+                    }
+                }
+            });
+
+            // Update backend status
+            if (data.backend) {
+                const backendItems = document.querySelectorAll('.card')[1]?.querySelectorAll('.status-item');
+                if (backendItems && backendItems.length >= 5) {
+                    // Update API endpoints count
+                    const apiEndpointItem = Array.from(backendItems).find(item => 
+                        item.textContent.includes('API Endpoints')
+                    );
+                    if (apiEndpointItem) {
+                        const badge = apiEndpointItem.querySelector('.status-badge');
+                        if (badge) {
+                            badge.textContent = `⏳ ${data.backend.apiEndpoints}/${data.backend.totalApiEndpoints}`;
+                        }
+                    }
+
+                    // Update services count
+                    const servicesItem = Array.from(backendItems).find(item => 
+                        item.textContent.includes('Services')
+                    );
+                    if (servicesItem) {
+                        const badge = servicesItem.querySelector('.status-badge');
+                        if (badge) {
+                            badge.textContent = `⏳ ${data.backend.services}/${data.backend.totalServices}`;
+                        }
+                    }
+                }
+            }
+
+            // Update database status
+            if (data.database) {
+                const dbItems = document.querySelectorAll('.card')[0]?.querySelectorAll('.status-item');
+                if (dbItems && dbItems.length >= 2) {
+                    const connectionItem = Array.from(dbItems).find(item => 
+                        item.textContent.includes('Connection')
+                    );
+                    if (connectionItem) {
+                        const badge = connectionItem.querySelector('.status-badge');
+                        if (badge) {
+                            badge.className = data.database.connection === 'ready' 
+                                ? 'status-badge badge-complete' 
+                                : 'status-badge badge-pending';
+                            badge.textContent = data.database.connection === 'ready' ? 'Ready' : 'Error';
+                        }
+                    }
+                }
+            }
+        }
+
+        // Suppress console errors for connection refused (expected when backend is offline)
+        const originalError = console.error;
+        console.error = function(...args) {
+            const message = args.join(' ');
+            // Suppress connection refused errors
+            if (message.includes('ERR_CONNECTION_REFUSED') || 
+                message.includes('Failed to fetch') ||
+                message.includes('net::ERR_CONNECTION_REFUSED') ||
+                message.includes('ConnectionRefused')) {
+                return; // Don't log these expected errors
+            }
+            originalError.apply(console, args);
+        };
+
+        // Initial fetch
+        fetchStatus();
+
+        // Auto-refresh every 30 seconds
+        setInterval(fetchStatus, REFRESH_INTERVAL);
+    </script>
 </body>
 </html>
 

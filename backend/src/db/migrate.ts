@@ -3,6 +3,9 @@
  * Runs SQL migrations from files
  */
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { sequelize } from './index';

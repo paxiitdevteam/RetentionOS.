@@ -1,0 +1,14 @@
+{
+  "name": "retentionos-marketing",
+  "version": "1.0.0",
+  "description": "RetentionOS Marketing Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["marketing", "website"],
+  "author": "RetentionOS",
+  "license": "MIT"
+}
+

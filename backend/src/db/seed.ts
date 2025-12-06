@@ -3,8 +3,12 @@
  * Creates initial admin user and sample data
  */
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 import bcrypt from 'bcrypt';
-import { AdminAccount, AdminRole } from '../models';
+import { AdminAccount } from '../models';
+import { AdminRole } from '../models/AdminAccount';
 import { sequelize } from './index';
 
 export const seedDatabase = async (): Promise<void> => {

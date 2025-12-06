@@ -12,6 +12,7 @@ interface ApiKeyAttributes {
   key: string; // Hashed key
   ownerId: number;
   createdAt?: Date;
+  updatedAt?: Date;
   lastUsed: Date | null;
   expiresAt: Date | null;
 }
@@ -26,6 +27,7 @@ class ApiKey extends Model<ApiKeyAttributes, ApiKeyCreationAttributes> implement
   public key!: string;
   public ownerId!: number;
   public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
   public lastUsed!: Date | null;
   public expiresAt!: Date | null;
 
@@ -60,6 +62,12 @@ ApiKey.init(
       allowNull: false,
       defaultValue: DataTypes.NOW,
       field: 'created_at',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      field: 'updated_at',
     },
     lastUsed: {
       type: DataTypes.DATE,

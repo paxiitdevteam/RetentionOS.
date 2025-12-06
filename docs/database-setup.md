@@ -40,10 +40,12 @@ Then create database and user:
 
 ```sql
 CREATE DATABASE retentionos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'retentionos'@'%' IDENTIFIED BY 'your_password';
+CREATE USER 'retentionos'@'%' IDENTIFIED WITH mysql_native_password BY 'your_password';
 GRANT ALL PRIVILEGES ON retentionos.* TO 'retentionos'@'%';
 FLUSH PRIVILEGES;
 ```
+
+**⚠️ IMPORTANT**: Use `mysql_native_password` authentication method. If you see `auth_gssapi_client` errors, see `docs/DATABASE_AUTH_FIX.md` for troubleshooting.
 
 ---
 

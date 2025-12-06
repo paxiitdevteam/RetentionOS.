@@ -4,9 +4,9 @@
  * Uses MariaDB/MySQL (multiplatform compatible)
  */
 
-import { SequelizeOptions } from 'sequelize-typescript';
+import { Options } from 'sequelize';
 
-export const dbConfig: SequelizeOptions = {
+export const dbConfig: Options = {
   dialect: 'mysql',
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '3306'),

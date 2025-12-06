@@ -11,6 +11,9 @@ import ChurnReason from './ChurnReason';
 import AdminAccount from './AdminAccount';
 import ApiKey from './ApiKey';
 import AuditLog from './AuditLog';
+import AIWeight from './AIWeight';
+import OfferPerformance from './OfferPerformance';
+import MessagePerformance from './MessagePerformance';
 
 // Initialize all associations
 // (Associations are defined in individual model files)
@@ -24,6 +27,9 @@ export {
   AdminAccount,
   ApiKey,
   AuditLog,
+  AIWeight,
+  OfferPerformance,
+  MessagePerformance,
 };
 
 export default {
@@ -35,5 +41,8 @@ export default {
   AdminAccount,
   ApiKey,
   AuditLog,
+  AIWeight,
+  OfferPerformance,
+  MessagePerformance,
 };
 
