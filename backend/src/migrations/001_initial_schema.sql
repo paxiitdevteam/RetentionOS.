@@ -124,3 +124,31 @@ CREATE TABLE IF NOT EXISTS ai_weights (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_ai_weights_weight_name (weight_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS offer_performance (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  offer_type VARCHAR(50) NOT NULL,
+  segment VARCHAR(50),
+  total_shown INT DEFAULT 0,
+  total_accepted INT DEFAULT 0,
+  acceptance_rate DECIMAL(5, 2) DEFAULT 0.0,
+  avg_revenue_saved DECIMAL(10, 2) DEFAULT 0.0,
+  last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_offer_performance_offer_type (offer_type),
+  INDEX idx_offer_performance_segment (segment),
+  UNIQUE KEY idx_offer_performance_unique (offer_type, segment)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS message_performance (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  message_template VARCHAR(255) NOT NULL,
+  offer_type VARCHAR(50) NOT NULL,
+  total_shown INT DEFAULT 0,
+  total_accepted INT DEFAULT 0,
+  acceptance_rate DECIMAL(5, 2) DEFAULT 0.0,
+  last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_message_performance_template (message_template),
+  INDEX idx_message_performance_offer_type (offer_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
