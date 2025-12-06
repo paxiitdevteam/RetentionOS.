@@ -9,7 +9,7 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
-import Modal, { ModalActions, ModalButton } from '../components/Modal';
+import Modal, { ModalActions, ModalButton, MessageModal } from '../components/Modal';
 
 interface UpcomingSubscription {
   subscriptionId: number;
@@ -82,6 +82,7 @@ const Subscriptions: NextPage = () => {
 
   const [showTriggerConfirm, setShowTriggerConfirm] = useState(false);
   const [triggerResult, setTriggerResult] = useState<{ triggered: number; failed: number } | null>(null);
+  const [showMessageModal, setShowMessageModal] = useState<{ type: 'success' | 'error'; title: string; message: string } | null>(null);
 
   const handleTriggerRetention = async () => {
     setShowTriggerConfirm(true);
@@ -99,7 +100,11 @@ const Subscriptions: NextPage = () => {
         }, 3000);
       }
     } catch (error: any) {
-      alert(`Error: ${error.message || 'Failed to trigger retention'}`);
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to trigger retention',
+      });
       setShowTriggerConfirm(false);
     }
   };
@@ -108,11 +113,19 @@ const Subscriptions: NextPage = () => {
     try {
       const response = await apiClient.checkAlerts();
       if (response.success) {
-        alert(`✅ Checked and sent ${response.count} alerts`);
+        setShowMessageModal({
+          type: 'success',
+          title: 'Success',
+          message: `Checked and sent ${response.count} alerts`,
+        });
         loadData();
       }
     } catch (error: any) {
-      alert(`Error: ${error.message || 'Failed to check alerts'}`);
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to check alerts',
+      });
     }
   };
 

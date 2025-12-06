@@ -38,6 +38,7 @@ const Settings: NextPage = () => {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [showMessageModal, setShowMessageModal] = useState<{ type: 'success' | 'error'; title: string; message: string } | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -86,14 +87,22 @@ const Settings: NextPage = () => {
       await loadApiKeys();
       setShowDeleteConfirm(null);
     } catch (err: any) {
-      alert(err.message || 'Failed to delete API key');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to delete API key',
+      });
       setShowDeleteConfirm(null);
     }
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert('Copied to clipboard!');
+    setShowMessageModal({
+      type: 'success',
+      title: 'Success',
+      message: 'Copied to clipboard!',
+    });
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {

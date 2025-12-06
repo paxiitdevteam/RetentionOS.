@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../services/api';
-import Modal, { FormField, ModalActions, ModalButton } from '../../components/Modal';
+import Modal, { FormField, ModalActions, ModalButton, MessageModal } from '../../components/Modal';
 
 interface FlowStep {
   type: 'pause' | 'downgrade' | 'discount' | 'support' | 'feedback';
@@ -50,6 +50,10 @@ const FlowBuilder: NextPage = () => {
   const [templateRegion, setTemplateRegion] = useState('');
   const [templateFile, setTemplateFile] = useState<File | null>(null);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState<{ type: 'success' | 'error'; title: string; message: string } | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
+  const [showTemplateSelector, setShowTemplateSelector] = useState<{ templates: Flow[] } | null>(null);
+  const [selectedTemplateIndex, setSelectedTemplateIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (id && id !== 'new') {
@@ -67,8 +71,12 @@ const FlowBuilder: NextPage = () => {
         }
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to load flow');
-      router.push('/flows');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to load flow',
+      });
+      setTimeout(() => router.push('/flows'), 2000);
     }
   };
 
@@ -90,7 +98,11 @@ const FlowBuilder: NextPage = () => {
       setValidation(validationResponse.validation);
       
       if (!validationResponse.validation.valid) {
-        alert(`Flow validation failed:\n${validationResponse.validation.errors.join('\n')}`);
+        setShowMessageModal({
+          type: 'error',
+          title: 'Validation Failed',
+          message: validationResponse.validation.errors.join('\n'),
+        });
         setSaving(false);
         return;
       }
@@ -159,14 +171,19 @@ const FlowBuilder: NextPage = () => {
   };
 
   const handleDeleteStep = (index: number) => {
-    if (!confirm('Delete this step?')) return;
-    const newSteps = flow.steps.filter((_, i) => i !== index);
-    setFlow({ ...flow, steps: newSteps });
-    if (selectedStepIndex === index) {
-      setSelectedStepIndex(newSteps.length > 0 ? Math.min(index, newSteps.length - 1) : null);
-    } else if (selectedStepIndex !== null && selectedStepIndex > index) {
-      setSelectedStepIndex(selectedStepIndex - 1);
-    }
+    setShowConfirmModal({
+      message: 'Delete this step?',
+      onConfirm: () => {
+        const newSteps = flow.steps.filter((_, i) => i !== index);
+        setFlow({ ...flow, steps: newSteps });
+        if (selectedStepIndex === index) {
+          setSelectedStepIndex(newSteps.length > 0 ? Math.min(index, newSteps.length - 1) : null);
+        } else if (selectedStepIndex !== null && selectedStepIndex > index) {
+          setSelectedStepIndex(selectedStepIndex - 1);
+        }
+        setShowConfirmModal(null);
+      },
+    });
   };
 
   const handleUpdateStep = (index: number, updates: Partial<FlowStep>) => {
@@ -809,21 +826,22 @@ const FlowBuilder: NextPage = () => {
                 });
 
                 if (response.success && response.templates.length > 0) {
-                  // Show template selector
-                  const templateNames = response.templates.map((t: Flow, i: number) => `${i + 1}. ${t.name}`).join('\n');
-                  const selection = prompt(`Select a template (1-${response.templates.length}):\n\n${templateNames}`);
-                  const index = parseInt(selection || '') - 1;
-                  if (index >= 0 && index < response.templates.length) {
-                    if (confirm(`Load "${response.templates[index].name}" template? This will replace your current flow.`)) {
-                      handleLoadTemplate(response.templates[index]);
-                      setShowTemplateModal(false);
-                    }
-                  }
+                  // Show template selector modal
+                  setShowTemplateSelector({ templates: response.templates });
+                  setShowTemplateModal(false);
                 } else {
-                  alert('No templates found from selected source');
+                  setShowMessageModal({
+                    type: 'error',
+                    title: 'No Templates',
+                    message: 'No templates found from selected source',
+                  });
                 }
               } catch (err: any) {
-                alert(err.message || 'Failed to load templates');
+                setShowMessageModal({
+                  type: 'error',
+                  title: 'Error',
+                  message: err.message || 'Failed to load templates',
+                });
                 console.error('Failed to load templates:', err);
               } finally {
                 setLoadingTemplates(false);

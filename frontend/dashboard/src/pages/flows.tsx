@@ -11,7 +11,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
 import { LoadingState, Alert, EmptyState, Button, Card } from '../components/ui';
-import Modal, { ModalActions, ModalButton } from '../components/Modal';
+import Modal, { ModalActions, ModalButton, MessageModal } from '../components/Modal';
 
 interface Flow {
   id: number;
@@ -32,6 +32,7 @@ const Flows: NextPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
   const [showDuplicateModal, setShowDuplicateModal] = useState<number | null>(null);
   const [duplicateName, setDuplicateName] = useState('');
+  const [showMessageModal, setShowMessageModal] = useState<{ type: 'success' | 'error'; title: string; message: string } | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -67,7 +68,11 @@ const Flows: NextPage = () => {
       await loadFlows();
       setShowDeleteConfirm(null);
     } catch (err: any) {
-      alert(err.message || 'Failed to delete flow');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to delete flow',
+      });
       setShowDeleteConfirm(null);
     }
   };
@@ -88,7 +93,11 @@ const Flows: NextPage = () => {
         setDuplicateName('');
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to duplicate flow');
+      setShowMessageModal({
+        type: 'error',
+        title: 'Error',
+        message: err.message || 'Failed to duplicate flow',
+      });
       setShowDuplicateModal(null);
     }
   };
