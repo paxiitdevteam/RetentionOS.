@@ -14,19 +14,41 @@ export const runMigrations = async (): Promise<void> => {
   try {
     console.log('🔄 Running database migrations...');
 
-    // Read migration file
-    const migrationPath = join(__dirname, '../migrations/001_initial_schema.sql');
-    const migrationSQL = readFileSync(migrationPath, 'utf-8');
+    // Get all migration files in order
+    const migrationFiles = [
+      '001_initial_schema.sql',
+      '002_add_subscription_dates_and_alerts.sql',
+    ];
 
-    // Split by semicolons and execute each statement
-    const statements = migrationSQL
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+    for (const migrationFile of migrationFiles) {
+      console.log(`📄 Running migration: ${migrationFile}`);
+      const migrationPath = join(__dirname, '../migrations', migrationFile);
+      const migrationSQL = readFileSync(migrationPath, 'utf-8');
 
-    for (const statement of statements) {
-      if (statement.trim()) {
-        await sequelize.query(statement);
+      // Split by semicolons and execute each statement
+      // For prepared statements, we need to handle them differently
+      const statements = migrationSQL
+        .split(';')
+        .map(s => s.trim())
+        .filter(s => s.length > 0 && !s.startsWith('--'));
+
+      for (const statement of statements) {
+        if (statement.trim()) {
+          try {
+            await sequelize.query(statement);
+          } catch (error: any) {
+            // Ignore errors for columns/tables that already exist
+            if (error.message && (
+              error.message.includes('Duplicate column') ||
+              error.message.includes('already exists') ||
+              error.message.includes('Duplicate key')
+            )) {
+              console.log(`⚠️  Skipping (already exists): ${statement.substring(0, 50)}...`);
+            } else {
+              throw error;
+            }
+          }
+        }
       }
     }
 
