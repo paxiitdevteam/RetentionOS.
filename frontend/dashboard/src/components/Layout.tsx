@@ -60,7 +60,7 @@ export default function Layout({ children }: LayoutProps) {
           <NavLink href="/subscriptions" label="Subscriptions" icon="💳" />
           <NavLink href="/analytics" label="Analytics" icon="📈" />
           <NavLink href="/flows" label="Flows" icon="🔄" />
-          <NavLink href="/ai" label="AI Analytics" icon="🤖" />
+          <NavLink href="/ai" label="AI Agent Dashboard" icon="🤖" />
           <NavLink href="/settings" label="Settings" icon="⚙️" />
         </nav>
 
@@ -120,7 +120,7 @@ export default function Layout({ children }: LayoutProps) {
                 {router.pathname === '/analytics' && 'Analytics'}
                 {router.pathname === '/flows' && 'Retention Flows'}
                 {router.pathname === '/flows/builder' && 'Flow Builder'}
-                {router.pathname === '/ai' && 'AI Analytics'}
+                {router.pathname === '/ai' && 'AI Agent Dashboard'}
                 {router.pathname === '/settings' && 'Settings'}
               </h2>
             </div>
