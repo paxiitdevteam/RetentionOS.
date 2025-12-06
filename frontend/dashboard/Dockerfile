@@ -17,8 +17,8 @@ RUN npm ci && npm cache clean --force
 COPY src ./src
 COPY public ./public
 
-# Build Next.js application
-RUN npm run build
+# Note: We don't build here for development - Next.js dev mode compiles on the fly
+# For production, build happens in CI/CD or use docker-compose.prod.yml
 
 # Production stage
 FROM node:20-alpine
@@ -34,10 +34,15 @@ COPY package*.json ./
 # Install production dependencies only
 RUN npm ci --only=production && npm cache clean --force
 
-# Copy built application from builder
-COPY --from=builder /app/.next ./.next
+# Copy application files
+# Note: In development mode, volumes override this with live code
+COPY --from=builder /app/src ./src
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/tailwind.config.js ./tailwind.config.js
+COPY --from=builder /app/postcss.config.js ./postcss.config.js
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -57,6 +62,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start Next.js production server
-CMD ["npm", "start"]
+# Start Next.js development server
+# In development, docker-compose overrides this with: npm run dev
+# For production, you should build first and use: npm start
+CMD ["npm", "run", "dev"]
 
