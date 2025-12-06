@@ -7,14 +7,14 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install ALL dependencies (including dev for ts-node-dev in development)
+# Install ALL dependencies (including dev for TypeScript build)
 RUN npm ci && npm cache clean --force
 
 # Copy source code
 COPY src ./src
 
-# Note: We don't build here - for development we use ts-node-dev
-# For production, build happens in CI/CD or use docker-compose.prod.yml
+# Build TypeScript for production
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine
@@ -27,13 +27,11 @@ RUN apk add --no-cache dumb-init
 # Copy package files
 COPY package*.json ./
 
-# Install ALL dependencies (including dev for ts-node-dev in development)
-# In production, use docker-compose.prod.yml which uses --only=production
-RUN npm ci && npm cache clean --force
+# Install production dependencies only
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy source code (always needed)
-# Note: In development mode, volumes override this with live code
-COPY --from=builder /app/src ./src
+# Copy built application from builder
+COPY --from=builder /app/dist ./dist
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -53,7 +51,6 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start application
-# In development, docker-compose overrides this with: npm run dev (ts-node-dev)
-# For production, you should build first and use: node dist/server.js
-CMD ["npm", "run", "dev"]
+# Start application in production mode
+# In development, docker-compose.yml overrides this with: npm run dev
+CMD ["node", "dist/server.js"]

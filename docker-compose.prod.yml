@@ -30,6 +30,8 @@ services:
       - retentionos-network
     volumes:
       - backend_logs:/app/logs
+    # Production mode: Uses CMD from Dockerfile (node dist/server.js)
+    # No command override - runs production build
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/status', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
@@ -53,6 +55,8 @@ services:
       - backend
     networks:
       - retentionos-network
+    # Production mode: Uses CMD from Dockerfile (npm start)
+    # No command override - runs production build
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
