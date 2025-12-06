@@ -784,6 +784,31 @@ class ApiClient {
       { method: 'GET' }
     );
   }
+
+  async getAIAgentActivity(limit: number = 50) {
+    return this.request<{ success: boolean; activity: any[] }>(
+      PMS.getAdminPath(`ai-agent/activity?limit=${limit}`)
+    );
+  }
+
+  async getAIAgentStats() {
+    return this.request<{ success: boolean; stats: any }>(
+      PMS.getAdminPath('ai-agent/stats')
+    );
+  }
+
+  async getEmailLogs(limit: number = 100) {
+    return this.request<{ success: boolean; logs: any[] }>(
+      PMS.getAdminPath(`email/logs?limit=${limit}`)
+    );
+  }
+
+  async processPendingAlertsWithAI() {
+    return this.request<{ success: boolean; processed: number; successful: number; failed: number; results: any[] }>(
+      PMS.getAdminPath('ai-agent/process-pending'),
+      { method: 'POST' }
+    );
+  }
 }
 
 // Export singleton instance
