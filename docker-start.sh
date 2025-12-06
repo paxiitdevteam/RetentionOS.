@@ -46,6 +46,7 @@ if [ $? -eq 0 ]; then
     echo "  🌐 Marketing Site: http://localhost:3002"
     echo "  💾 Database:       localhost:3306"
     echo "  🔴 Redis:          localhost:6379"
+    echo "  🗄️  phpMyAdmin:    http://localhost:8080"
     echo ""
     echo "View logs: docker-compose logs -f"
     echo "Stop all:  docker-compose down"

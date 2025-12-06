@@ -39,6 +39,7 @@ Once started, services are available at:
 - **Marketing Site**: http://localhost:3002
 - **Database**: localhost:3306
 - **Redis**: localhost:6379
+- **phpMyAdmin**: http://localhost:8080 (Database visualization)
 
 ### Stop Everything
 
