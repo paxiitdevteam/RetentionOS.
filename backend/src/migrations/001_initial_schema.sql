@@ -114,3 +114,13 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   INDEX idx_audit_logs_created_at (created_at),
   INDEX idx_audit_logs_resource_id (resource_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ai_weights (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  weight_name VARCHAR(255) UNIQUE NOT NULL,
+  weight_value DECIMAL(10, 4) NOT NULL DEFAULT 1.0,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_ai_weights_weight_name (weight_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
