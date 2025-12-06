@@ -34,6 +34,8 @@ import {
   getFlowTemplates,
   activateFlow,
   deactivateFlow,
+  generateTemplatesFromDatabase,
+  loadTemplatesFromUrl,
 } from '../services/FlowService';
 
 const router = Router();
@@ -1060,7 +1062,7 @@ router.post('/flows/validate', authenticate, async (req: Request, res: Response)
 
 /**
  * GET /admin/flows/templates
- * Get flow templates
+ * Get flow templates from source
  * Requires authentication
  */
 router.get('/flows/templates', authenticate, async (req: Request, res: Response) => {
@@ -1083,6 +1085,104 @@ router.get('/flows/templates', authenticate, async (req: Request, res: Response)
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message || 'Failed to get templates',
+    });
+  }
+});
+
+/**
+ * POST /admin/flows/templates/from-database
+ * Generate templates from subscription database
+ * Requires authentication
+ */
+router.post('/flows/templates/from-database', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const { plan, minValue, maxValue, region } = req.body;
+    const templates = await generateTemplatesFromDatabase(plan, minValue, maxValue, region);
+
+    res.json({
+      success: true,
+      templates,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to generate templates from database',
+    });
+  }
+});
+
+/**
+ * POST /admin/flows/templates/from-url
+ * Load templates from website URL
+ * Requires authentication
+ */
+router.post('/flows/templates/from-url', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const { url } = req.body;
+    if (!url) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'URL is required',
+      });
+      return;
+    }
+
+    const templates = await loadTemplatesFromUrl(url);
+
+    res.json({
+      success: true,
+      templates,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to load templates from URL',
+    });
+  }
+});
+
+/**
+ * POST /admin/flows/templates/from-excel
+ * Load templates from Excel file
+ * Requires authentication
+ * Note: File should be sent as multipart/form-data
+ */
+router.post('/flows/templates/from-excel', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    // For now, return error - Excel parsing requires additional setup
+    // In production, use multer or similar for file upload
+    res.status(501).json({
+      error: 'Not Implemented',
+      message: 'Excel file upload requires file upload middleware. Please use the frontend file upload feature.',
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to load templates from Excel',
     });
   }
 });

@@ -39,6 +39,15 @@ const FlowBuilder: NextPage = () => {
   const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [validation, setValidation] = useState<{ valid: boolean; errors: string[]; warnings: string[] } | null>(null);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [templateSource, setTemplateSource] = useState<'source' | 'database' | 'url' | 'excel'>('source');
+  const [templateUrl, setTemplateUrl] = useState('');
+  const [templatePlan, setTemplatePlan] = useState('');
+  const [templateMinValue, setTemplateMinValue] = useState('');
+  const [templateMaxValue, setTemplateMaxValue] = useState('');
+  const [templateRegion, setTemplateRegion] = useState('');
+  const [templateFile, setTemplateFile] = useState<File | null>(null);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
 
   useEffect(() => {
     if (id && id !== 'new') {
@@ -389,25 +398,7 @@ const FlowBuilder: NextPage = () => {
                 ))}
               </div>
               <button
-                onClick={async () => {
-                  try {
-                    const response = await apiClient.getFlowTemplates();
-                    if (response.success && response.templates.length > 0) {
-                      // Show template selector
-                      const templateNames = response.templates.map((t: Flow, i: number) => `${i + 1}. ${t.name}`).join('\n');
-                      const selection = prompt(`Select a template (1-${response.templates.length}):\n\n${templateNames}`);
-                      const index = parseInt(selection || '') - 1;
-                      if (index >= 0 && index < response.templates.length) {
-                        if (confirm(`Load "${response.templates[index].name}" template? This will replace your current flow.`)) {
-                          handleLoadTemplate(response.templates[index]);
-                        }
-                      }
-                    }
-                  } catch (err: any) {
-                    alert(err.message || 'Failed to load templates');
-                    console.error('Failed to load templates:', err);
-                  }
-                }}
+                onClick={() => setShowTemplateModal(true)}
                 style={{
                   width: '100%',
                   padding: '8px',

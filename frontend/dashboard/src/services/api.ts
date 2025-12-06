@@ -364,7 +364,124 @@ class ApiClient {
     });
   }
 
-  async getFlowTemplates() {
+  async getFlowTemplates(source: 'source' | 'database' | 'url' | 'excel' = 'source', options?: {
+    url?: string;
+    plan?: string;
+    minValue?: number;
+    maxValue?: number;
+    region?: string;
+    file?: File;
+  }) {
+    if (source === 'database') {
+      return this.request<{
+        success: boolean;
+        templates: any[];
+      }>(`${PMS.getApiPath('/admin/flows/templates/from-database')}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          plan: options?.plan,
+          minValue: options?.minValue,
+          maxValue: options?.maxValue,
+          region: options?.region,
+        }),
+      });
+    }
+
+    if (source === 'url') {
+      return this.request<{
+        success: boolean;
+        templates: any[];
+      }>(`${PMS.getApiPath('/admin/flows/templates/from-url')}`, {
+        method: 'POST',
+        body: JSON.stringify({ url: options?.url }),
+      });
+    }
+
+    if (source === 'excel') {
+      // For Excel, we'll handle file upload in the frontend
+      // Parse Excel file client-side and convert to templates
+      if (!options?.file) {
+        throw new Error('Excel file is required');
+      }
+      return this.parseExcelFile(options.file);
+    }
+
+    // Default: get from source
+    return this.request<{
+      success: boolean;
+      templates: any[];
+    }>(PMS.getApiPath('/admin/flows/templates'));
+  }
+
+  private async parseExcelFile(file: File): Promise<{
+    success: boolean;
+    templates: any[];
+  }> {
+    // Dynamic import of xlsx library (if available)
+    // For now, return error suggesting to use a library
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          // Basic CSV parsing (if file is CSV)
+          const text = e.target?.result as string;
+          if (file.name.endsWith('.csv')) {
+            const templates = this.parseCSVToTemplates(text);
+            resolve({ success: true, templates });
+          } else {
+            // For Excel files, would need xlsx library
+            reject(new Error('Excel file parsing requires xlsx library. Please convert to CSV or use another source.'));
+          }
+        } catch (error: any) {
+          reject(new Error(`Failed to parse file: ${error.message}`));
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsText(file);
+    });
+  }
+
+  private parseCSVToTemplates(csvText: string): any[] {
+    const lines = csvText.split('\n').filter(line => line.trim());
+    if (lines.length < 2) {
+      throw new Error('CSV file must have at least a header and one data row');
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const templates: any[] = [];
+    const templateMap = new Map<string, any>();
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim());
+      const row: any = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+
+      const templateName = row['template_name'] || row['name'] || 'Imported Template';
+      if (!templateMap.has(templateName)) {
+        templateMap.set(templateName, {
+          name: templateName,
+          language: row['language'] || 'en',
+          steps: [],
+        });
+      }
+
+      const template = templateMap.get(templateName);
+      if (row['step_type'] && row['step_title'] && row['step_message']) {
+        template.steps.push({
+          type: row['step_type'],
+          title: row['step_title'],
+          message: row['step_message'],
+          config: row['step_config'] ? JSON.parse(row['step_config']) : {},
+        });
+      }
+    }
+
+    return Array.from(templateMap.values());
+  }
+
+  async getFlowTemplatesFromSource() {
     return this.request<{
       success: boolean;
       templates: Array<{

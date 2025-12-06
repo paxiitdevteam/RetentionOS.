@@ -405,6 +405,220 @@ export function getFlowTemplates(): FlowData[] {
 }
 
 /**
+ * Generate templates from subscription database
+ * Creates templates based on real subscription data patterns
+ * @param plan Optional plan filter
+ * @param minValue Optional minimum subscription value filter
+ * @param maxValue Optional maximum subscription value filter
+ * @param region Optional region filter
+ * @returns Array of template flow data
+ */
+export async function generateTemplatesFromDatabase(
+  plan?: string,
+  minValue?: number,
+  maxValue?: number,
+  region?: string
+): Promise<FlowData[]> {
+
+  // Build query filters
+  const whereClause: any = {};
+  if (plan) {
+    whereClause.plan = plan;
+  }
+  if (region) {
+    whereClause.region = region;
+  }
+
+  // Build user where clause
+  const userWhere: any = {};
+  if (plan) {
+    userWhere.plan = plan;
+  }
+  if (region) {
+    userWhere.region = region;
+  }
+
+  // Get subscriptions with filters
+  const subscriptions = await Subscription.findAll({
+    include: [{
+      model: User,
+      as: 'user',
+      where: Object.keys(userWhere).length > 0 ? userWhere : undefined,
+    }],
+    where: {
+      ...(minValue && { value: { [Op.gte]: minValue } }),
+      ...(maxValue && { value: { [Op.lte]: maxValue } }),
+    },
+    limit: 100, // Limit to prevent too many templates
+  });
+
+  // Group by plan and value ranges to create templates
+  const templates: FlowData[] = [];
+  const planGroups = new Map<string, any[]>();
+
+  subscriptions.forEach((sub: any) => {
+    const userPlan = sub.user?.plan || 'default';
+    if (!planGroups.has(userPlan)) {
+      planGroups.set(userPlan, []);
+    }
+    planGroups.get(userPlan)!.push(sub);
+  });
+
+  // Generate templates based on subscription patterns
+  planGroups.forEach((subs, planName) => {
+    const avgValue = subs.reduce((sum, s) => sum + (s.value || 0), 0) / subs.length;
+    const cancelAttempts = subs.filter((s) => s.cancelAttempts > 0).length;
+
+    // High-value customer template
+    if (avgValue >= 50) {
+      templates.push({
+        name: `High-Value ${planName} Retention Flow`,
+        language: 'en',
+        steps: [
+          {
+            type: 'pause',
+            title: 'We Value Your Business',
+            message: `As a valued ${planName} customer, would you like to pause your subscription instead of canceling?`,
+          },
+          {
+            type: 'discount',
+            title: 'Exclusive Offer for You',
+            message: `Get 30% off your next 6 months! Your ${planName} plan at a special rate.`,
+            config: { percentage: 30, duration: 6 },
+          },
+          {
+            type: 'support',
+            title: 'Personal Account Manager',
+            message: 'Our team is ready to help. Schedule a call to discuss your needs.',
+            config: { contactInfo: 'support@retentionos.com' },
+          },
+        ],
+      });
+    }
+
+    // Standard template
+    templates.push({
+      name: `${planName} Standard Retention Flow`,
+      language: 'en',
+      steps: [
+        {
+          type: 'pause',
+          title: 'Wait, before you go...',
+          message: 'Would you like to pause your subscription instead?',
+        },
+        {
+          type: 'discount',
+          title: 'Special Offer',
+          message: 'Get 20% off your next 3 months!',
+          config: { percentage: 20, duration: 3 },
+        },
+        {
+          type: 'feedback',
+          title: 'Help Us Improve',
+          message: 'We\'d love to hear why you\'re canceling.',
+        },
+      ],
+    });
+
+    // High cancel attempts template
+    if (cancelAttempts > 0) {
+      templates.push({
+        name: `${planName} Aggressive Retention Flow`,
+        language: 'en',
+        steps: [
+          {
+            type: 'downgrade',
+            title: 'Switch to a Lower Plan?',
+            message: 'Find a plan that better fits your needs.',
+            config: { plan: 'basic' },
+          },
+          {
+            type: 'discount',
+            title: '50% Off Next 6 Months',
+            message: 'We want to keep you! Here\'s a special discount.',
+            config: { percentage: 50, duration: 6 },
+          },
+          {
+            type: 'support',
+            title: 'Talk to Our Team',
+            message: 'Our support team can help find a solution.',
+            config: { contactInfo: 'support@retentionos.com' },
+          },
+        ],
+      });
+    }
+  });
+
+  return templates.length > 0 ? templates : getFlowTemplates(); // Fallback to default templates
+}
+
+/**
+ * Load templates from website URL
+ * Fetches and parses templates from external source
+ * @param url Website URL to fetch templates from
+ * @returns Array of template flow data
+ */
+export async function loadTemplatesFromUrl(url: string): Promise<FlowData[]> {
+  try {
+    // Use native fetch (Node.js 18+) or fallback to https
+    let response: any;
+    if (typeof fetch !== 'undefined') {
+      response = await fetch(url, {
+        headers: {
+          'User-Agent': 'RetentionOS/1.0',
+        },
+      } as any);
+    } else {
+      // Fallback for older Node.js versions
+      const https = require('https');
+      const http = require('http');
+      const urlModule = require('url');
+      const parsedUrl = urlModule.parse(url);
+      const client = parsedUrl.protocol === 'https:' ? https : http;
+      
+      response = await new Promise((resolve, reject) => {
+        const req = client.get(url, { headers: { 'User-Agent': 'RetentionOS/1.0' } }, (res: any) => {
+          let data = '';
+          res.on('data', (chunk: any) => { data += chunk; });
+          res.on('end', () => {
+            resolve({
+              ok: res.statusCode === 200,
+              statusText: res.statusMessage,
+              json: async () => JSON.parse(data),
+            });
+          });
+        });
+        req.on('error', reject);
+        req.setTimeout(10000, () => {
+          req.destroy();
+          reject(new Error('Request timeout'));
+        });
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch from URL: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Expect JSON format: { templates: FlowData[] }
+    if (data.templates && Array.isArray(data.templates)) {
+      return data.templates;
+    }
+
+    // If single template object
+    if (data.name && data.steps) {
+      return [data];
+    }
+
+    throw new Error('Invalid template format from URL');
+  } catch (error: any) {
+    throw new Error(`Failed to load templates from URL: ${error.message}`);
+  }
+}
+
+/**
  * Activate flow (set ranking score > 0)
  * @param flowId Flow ID
  * @returns Updated flow
