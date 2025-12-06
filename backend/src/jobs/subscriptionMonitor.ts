@@ -25,14 +25,19 @@ export async function runDailySubscriptionMonitor(): Promise<void> {
     const alerts = await checkAndSendAlerts([30, 14, 7, 3, 1]);
     console.log(`✅ Sent ${alerts.length} alerts`);
 
-    // 2. Trigger proactive retention for subscriptions expiring in 7 days
+    // 2. Process pending alerts with AI agent
+    console.log('🤖 Processing pending alerts with AI agent...');
+    const aiResults = await processPendingAlertsWithAI();
+    console.log(`✅ AI Agent processed ${aiResults.processed} alerts (${aiResults.successful} successful, ${aiResults.failed} failed)`);
+
+    // 3. Trigger proactive retention for subscriptions expiring in 7 days
     console.log('🎯 Triggering proactive retention for subscriptions expiring in 7 days...');
     const retentionResults = await triggerProactiveRetention(7);
     const successful = retentionResults.filter((r) => r.success).length;
     const failed = retentionResults.filter((r) => !r.success).length;
     console.log(`✅ Triggered ${successful} retention flows (${failed} failed)`);
 
-    // 3. Get statistics
+    // 4. Get statistics
     const stats = await getSubscriptionStats();
     const alertStats = await getAlertStats();
 

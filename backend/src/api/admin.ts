@@ -1594,6 +1594,114 @@ router.put('/subscriptions/:id/alerts/read-all', authenticate, async (req: Reque
 });
 
 /**
+ * POST /admin/ai-agent/process-alert
+ * Process a specific alert with AI agent
+ * Requires authentication
+ */
+router.post('/ai-agent/process-alert', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const { subscriptionId, userId, alertType, daysUntilEnd, plan, value, cancelAttempts } = req.body;
+
+    if (!subscriptionId || !userId || !alertType) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'subscriptionId, userId, and alertType are required',
+      });
+      return;
+    }
+
+    const context = {
+      subscriptionId,
+      userId,
+      userEmail: req.body.userEmail || null,
+      plan: plan || 'unknown',
+      value: value || null,
+      daysUntilEnd: daysUntilEnd || 0,
+      cancelAttempts: cancelAttempts || 0,
+      alertType,
+    };
+
+    const result = await processAlertWithAI(context);
+
+    res.json({
+      success: result.success,
+      result,
+    });
+  } catch (error: any) {
+    console.error('Error processing alert with AI:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to process alert with AI',
+    });
+  }
+});
+
+/**
+ * POST /admin/ai-agent/process-pending
+ * Process all pending alerts with AI agent
+ * Requires authentication
+ */
+router.post('/ai-agent/process-pending', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const result = await processPendingAlertsWithAI();
+
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error: any) {
+    console.error('Error processing pending alerts:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to process pending alerts',
+    });
+  }
+});
+
+/**
+ * POST /admin/email/test
+ * Test email configuration
+ * Requires authentication
+ */
+router.post('/email/test', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const result = await testEmailConfiguration();
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('Error testing email:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to test email configuration',
+    });
+  }
+});
+
+/**
  * POST /admin/flows/:id/activate
  * Activate flow (set ranking score > 0)
  * Requires authentication and admin role

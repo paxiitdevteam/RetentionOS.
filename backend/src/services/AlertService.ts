@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import Alert from '../models/Alert';
 import Subscription from '../models/Subscription';
 import User from '../models/User';
+import { processAlertWithAI } from './AIAgentService';
 
 export type AlertType =
   | 'renewal_reminder'
@@ -29,9 +30,10 @@ export interface CreateAlertInput {
 /**
  * Create a new alert
  * @param input Alert data
+ * @param useAI Whether to process with AI agent (default: true)
  * @returns Created alert
  */
-export async function createAlert(input: CreateAlertInput): Promise<Alert> {
+export async function createAlert(input: CreateAlertInput, useAI: boolean = true): Promise<Alert> {
   const alert = await Alert.create({
     subscriptionId: input.subscriptionId,
     userId: input.userId,
@@ -42,10 +44,42 @@ export async function createAlert(input: CreateAlertInput): Promise<Alert> {
     read: false,
   });
 
-  // Optionally send email notification (implement email service later)
-  if (input.emailSent === false && shouldSendEmail(input.alertType)) {
-    // TODO: Implement email sending
-    // await sendEmailNotification(alert);
+  // Process with AI agent if enabled
+  if (useAI && process.env.AI_AGENT_ENABLED !== 'false') {
+    try {
+      // Get subscription and user context
+      const subscription = await Subscription.findByPk(input.subscriptionId, {
+        include: [{ model: User, as: 'user' }],
+      });
+
+      if (subscription && subscription.user) {
+        const user = subscription.user as User;
+        const now = new Date();
+        const endDate = subscription.endDate || new Date();
+        const daysUntilEnd = subscription.endDate
+          ? Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          : 0;
+
+        const context = {
+          subscriptionId: subscription.id,
+          userId: user.id,
+          userEmail: user.email || null,
+          plan: user.plan || 'unknown',
+          value: subscription.value,
+          daysUntilEnd,
+          cancelAttempts: subscription.cancelAttempts,
+          alertType: input.alertType,
+        };
+
+        // Process with AI agent (async, don't wait)
+        processAlertWithAI(context).catch((error) => {
+          console.error('Error processing alert with AI:', error);
+        });
+      }
+    } catch (error) {
+      console.error('Error setting up AI agent processing:', error);
+      // Continue even if AI processing fails
+    }
   }
 
   return alert;
