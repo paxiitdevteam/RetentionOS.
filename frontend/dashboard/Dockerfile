@@ -31,8 +31,9 @@ RUN apk add --no-cache dumb-init
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production && npm cache clean --force
+# Install ALL dependencies (including dev for Next.js dev mode)
+# In production, use docker-compose.prod.yml which uses --only=production
+RUN npm ci && npm cache clean --force
 
 # Copy application files
 # Note: In development mode, volumes override this with live code

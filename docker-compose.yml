@@ -34,6 +34,8 @@ services:
       - ./backend/src:/app/src
       - ./backend/package.json:/app/package.json
       - ./backend/tsconfig.json:/app/tsconfig.json
+      # Use named volume for node_modules to persist dependencies
+      # Dependencies are installed in Dockerfile, so this volume will have them
       - backend_node_modules:/app/node_modules
       - backend_logs:/app/logs
     # Override CMD for development (use ts-node-dev for hot reload)
