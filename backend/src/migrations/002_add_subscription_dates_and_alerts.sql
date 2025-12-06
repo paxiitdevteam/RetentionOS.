@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS alerts (
   INDEX idx_alerts_subscription_id (subscription_id),
   INDEX idx_alerts_user_id (user_id),
   INDEX idx_alerts_alert_type (alert_type),
-  INDEX idx_alerts_read (read),
+  INDEX idx_alerts_read (`read`),
   INDEX idx_alerts_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
