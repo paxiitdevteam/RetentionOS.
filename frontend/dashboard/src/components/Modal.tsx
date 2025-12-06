@@ -7,6 +7,40 @@
 import { ReactNode } from 'react';
 import './Modal.css';
 
+// Add global styles for modal animations
+if (typeof document !== 'undefined') {
+  const styleId = 'retentionos-modal-styles';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes modalSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .modal-overlay {
+        animation: modalFadeIn 0.2s ease-out !important;
+        backdrop-filter: blur(2px);
+      }
+      .modal-content {
+        animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        will-change: transform, opacity;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
