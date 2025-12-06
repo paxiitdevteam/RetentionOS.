@@ -375,62 +375,79 @@ const ROI: NextPage = () => {
 
             {/* Revenue Forecast */}
             {forecast && (
-              <Card style={{ padding: '24px', marginBottom: '32px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#003A78', margin: 0 }}>
-                    Revenue Impact Forecast (90 Days)
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+                {/* Cumulative Revenue Chart */}
+                <Card style={{ padding: '24px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#003A78', marginBottom: '20px' }}>
+                    Cumulative Revenue Forecast
                   </h3>
-                  <div style={{ fontSize: '12px', color: '#666' }}>
+                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>
                     Confidence: {forecast.forecastConfidence}%
                   </div>
-                </div>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={forecast.projectedRevenue}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    />
-                    <YAxis
-                      yAxisId={0}
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => formatCurrency(value)}
-                    />
-                    <YAxis
-                      yAxisId={1}
-                      orientation="right"
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => formatPercentage(value)}
-                    />
-                    <Tooltip
-                      formatter={(value: any, name: string) => {
-                        if (name === 'projectedRevenue') return formatCurrency(value);
-                        if (name === 'projectedROI') return formatPercentage(value);
-                        return formatCurrency(value);
-                      }}
-                      labelFormatter={(label) => formatDate(label)}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="cumulativeRevenue"
-                      stroke="#1F9D55"
-                      strokeWidth={2}
-                      name="Cumulative Revenue Saved"
-                      yAxisId={0}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="projectedROI"
-                      stroke="#003A78"
-                      strokeWidth={2}
-                      name="Projected ROI %"
-                      yAxisId={1}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Card>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={forecast.projectedRevenue}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => formatCurrency(value)}
+                      />
+                      <Tooltip
+                        formatter={(value: any) => formatCurrency(value)}
+                        labelFormatter={(label) => formatDate(label)}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="cumulativeRevenue"
+                        stroke="#1F9D55"
+                        strokeWidth={2}
+                        name="Cumulative Revenue Saved"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Card>
+
+                {/* ROI Forecast Chart */}
+                <Card style={{ padding: '24px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#003A78', marginBottom: '20px' }}>
+                    Projected ROI Forecast
+                  </h3>
+                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>
+                    Confidence: {forecast.forecastConfidence}%
+                  </div>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={forecast.projectedRevenue}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => formatPercentage(value)}
+                      />
+                      <Tooltip
+                        formatter={(value: any) => formatPercentage(value)}
+                        labelFormatter={(label) => formatDate(label)}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="projectedROI"
+                        stroke="#003A78"
+                        strokeWidth={2}
+                        name="Projected ROI %"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Card>
+              </div>
             )}
 
             {/* Summary Section */}
