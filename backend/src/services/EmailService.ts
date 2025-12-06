@@ -151,6 +151,18 @@ export async function sendEmailToCompany(options: CompanyEmailOptions): Promise<
   }
 }
 
+// In-memory email log storage (in production, use a database table)
+const emailLogs: Array<{
+  id: number;
+  to: string;
+  subject: string;
+  template: string;
+  status: 'sent' | 'failed';
+  timestamp: string;
+  metadata?: Record<string, any>;
+}> = [];
+let emailLogIdCounter = 1;
+
 /**
  * Log email sent (for tracking and analytics)
  */
@@ -162,13 +174,41 @@ async function logEmailSent(data: {
   metadata?: Record<string, any>;
 }): Promise<void> {
   try {
-    // Create email log entry (you can create an EmailLog model if needed)
-    // For now, we'll just log to console
+    emailLogs.push({
+      id: emailLogIdCounter++,
+      to: data.to,
+      subject: data.subject,
+      template: data.template,
+      status: 'sent',
+      timestamp: new Date().toISOString(),
+      metadata: data.metadata,
+    });
+    // Keep only last 1000 logs
+    if (emailLogs.length > 1000) {
+      emailLogs.shift();
+    }
     console.log(`📧 Email logged: ${data.template} to ${data.to}`);
   } catch (error) {
     // Silent fail for logging
     console.error('Error logging email:', error);
   }
+}
+
+/**
+ * Get email logs
+ */
+export async function getEmailLogs(limit: number = 100): Promise<Array<{
+  id: number;
+  to: string;
+  subject: string;
+  template: string;
+  status: 'sent' | 'failed';
+  timestamp: string;
+  metadata?: Record<string, any>;
+}>> {
+  return emailLogs
+    .slice(-limit)
+    .reverse(); // Most recent first
 }
 
 /**

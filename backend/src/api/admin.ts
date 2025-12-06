@@ -1734,6 +1734,92 @@ router.post('/email/test', authenticate, requireAdmin, async (req: Request, res:
 });
 
 /**
+ * GET /admin/ai-agent/activity
+ * Get recent AI agent activity logs
+ * Requires authentication
+ */
+router.get('/ai-agent/activity', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+    const { getAIAgentActivity } = await import('../services/AIAgentService');
+    const activity = await getAIAgentActivity(limit);
+
+    res.json({ success: true, activity });
+  } catch (error: any) {
+    console.error('Error getting AI agent activity:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get AI agent activity',
+    });
+  }
+});
+
+/**
+ * GET /admin/ai-agent/stats
+ * Get AI agent statistics
+ * Requires authentication
+ */
+router.get('/ai-agent/stats', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const { getAIAgentStats } = await import('../services/AIAgentService');
+    const stats = await getAIAgentStats();
+
+    res.json({ success: true, stats });
+  } catch (error: any) {
+    console.error('Error getting AI agent stats:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get AI agent stats',
+    });
+  }
+});
+
+/**
+ * GET /admin/email/logs
+ * Get email logs
+ * Requires authentication
+ */
+router.get('/email/logs', authenticate, async (req: Request, res: Response) => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Not authenticated',
+      });
+      return;
+    }
+
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+    const { getEmailLogs } = await import('../services/EmailService');
+    const logs = await getEmailLogs(limit);
+
+    res.json({ success: true, logs });
+  } catch (error: any) {
+    console.error('Error getting email logs:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'Failed to get email logs',
+    });
+  }
+});
+
+/**
  * POST /admin/flows/:id/activate
  * Activate flow (set ranking score > 0)
  * Requires authentication and admin role

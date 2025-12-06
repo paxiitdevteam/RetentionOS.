@@ -434,3 +434,124 @@ export async function processPendingAlertsWithAI(): Promise<{
   };
 }
 
+/**
+ * Get recent AI agent activity logs
+ * Returns activity from alerts and audit logs
+ */
+export async function getAIAgentActivity(limit: number = 50): Promise<Array<{
+  id: number;
+  subscriptionId: number;
+  userId: number;
+  alertType: string;
+  action: string;
+  priority: string;
+  message: string;
+  status: 'success' | 'failed';
+  timestamp: string;
+  metadata?: any;
+}>> {
+  const Alert = (await import('../models/Alert')).default;
+  const alerts = await Alert.findAll({
+    where: {
+      alertType: {
+        [Op.in]: ['renewal_reminder', 'expiring_soon', 'expired', 'auto_retention_triggered'],
+      },
+    },
+    order: [['createdAt', 'DESC']],
+    limit,
+    include: [
+      {
+        model: (await import('../models/Subscription')).default,
+        as: 'subscription',
+      },
+    ],
+  });
+
+  return alerts.map((alert) => ({
+    id: alert.id,
+    subscriptionId: alert.subscriptionId,
+    userId: alert.userId,
+    alertType: alert.alertType,
+    action: 'process_alert',
+    priority: alert.metadata?.priority || 'medium',
+    message: alert.message,
+    status: alert.read ? 'success' : 'failed',
+    timestamp: alert.createdAt.toISOString(),
+    metadata: alert.metadata,
+  }));
+}
+
+/**
+ * Get AI agent statistics
+ */
+export async function getAIAgentStats(): Promise<{
+  totalProcessed: number;
+  successful: number;
+  failed: number;
+  emailsSent: number;
+  alertsProcessed: number;
+  retentionFlowsTriggered: number;
+  companyNotificationsSent: number;
+  last24Hours: {
+    processed: number;
+    successful: number;
+    failed: number;
+  };
+}> {
+  const Alert = (await import('../models/Alert')).default;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const allAlerts = await Alert.findAll({
+    where: {
+      alertType: {
+        [Op.in]: ['renewal_reminder', 'expiring_soon', 'expired', 'auto_retention_triggered'],
+      },
+    },
+  });
+
+  const recentAlerts = await Alert.findAll({
+    where: {
+      alertType: {
+        [Op.in]: ['renewal_reminder', 'expiring_soon', 'expired', 'auto_retention_triggered'],
+      },
+      createdAt: {
+        [Op.gte]: yesterday,
+      },
+    },
+  });
+
+  const totalProcessed = allAlerts.length;
+  const successful = allAlerts.filter(a => a.read).length;
+  const failed = allAlerts.filter(a => !a.read).length;
+
+  // Count emails sent (from metadata)
+  const emailsSent = allAlerts.filter(a => a.emailSent).length;
+
+  // Count retention flows triggered
+  const retentionFlowsTriggered = allAlerts.filter(a => 
+    a.alertType === 'auto_retention_triggered' || 
+    (a.metadata && a.metadata.flowId)
+  ).length;
+
+  // Company notifications (estimated from high-priority alerts)
+  const companyNotificationsSent = allAlerts.filter(a => 
+    a.metadata && (a.metadata.priority === 'high' || a.metadata.priority === 'urgent')
+  ).length;
+
+  return {
+    totalProcessed,
+    successful,
+    failed,
+    emailsSent,
+    alertsProcessed: totalProcessed,
+    retentionFlowsTriggered,
+    companyNotificationsSent,
+    last24Hours: {
+      processed: recentAlerts.length,
+      successful: recentAlerts.filter(a => a.read).length,
+      failed: recentAlerts.filter(a => !a.read).length,
+    },
+  };
+}
+
