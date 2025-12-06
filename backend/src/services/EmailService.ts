@@ -5,7 +5,6 @@
  */
 
 import nodemailer from 'nodemailer';
-import EmailTemplate from '../models/EmailTemplate';
 
 export interface EmailOptions {
   to: string;
