@@ -49,8 +49,9 @@ COPY --from=builder /app/postcss.config.js ./postcss.config.js
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Change ownership
-RUN chown -R nodejs:nodejs /app
+# Create .next directory and change ownership
+RUN mkdir -p /app/.next && \
+    chown -R nodejs:nodejs /app
 USER nodejs
 
 # Expose port
