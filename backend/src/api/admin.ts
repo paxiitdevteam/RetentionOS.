@@ -41,12 +41,17 @@ const router = Router();
 /**
  * GET /admin/login
  * Returns method not allowed (login must be POST)
+ * Also handles OPTIONS for CORS preflight
  */
 router.get('/login', (req: Request, res: Response) => {
   res.status(405).json({
     error: 'Method Not Allowed',
     message: 'Login endpoint requires POST method',
   });
+});
+
+router.options('/login', (req: Request, res: Response) => {
+  res.status(200).end();
 });
 
 /**

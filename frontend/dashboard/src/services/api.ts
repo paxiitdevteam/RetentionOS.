@@ -69,9 +69,15 @@ class ApiClient {
     // Handle 401 Unauthorized
     if (response.status === 401) {
       this.setToken(null);
-      // Only redirect if not already on login page
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+      // Don't redirect if we're already on login page or checking auth
+      // Only redirect if not already on login page and it's not an auth check
+      const isLoginPage = typeof window !== 'undefined' && window.location.pathname.includes('/login');
+      const isAuthCheck = endpoint.includes('/admin/me') || endpoint.includes('/admin/login');
+      
+      if (!isLoginPage && !isAuthCheck) {
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
       }
       throw new Error('Unauthorized');
     }

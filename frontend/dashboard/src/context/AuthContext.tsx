@@ -47,18 +47,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const checkAuth = async () => {
     try {
       const token = apiClient.getToken();
-      if (token) {
-        const response = await apiClient.getCurrentAdmin();
-        if (response.success) {
-          setAdmin(response.admin);
-        } else {
-          apiClient.setToken(null);
-        }
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
+      const response = await apiClient.getCurrentAdmin();
+      if (response.success) {
+        setAdmin(response.admin);
+      } else {
+        apiClient.setToken(null);
       }
     } catch (error: any) {
       // Silently handle auth errors - user might not be logged in yet
-      // Only log if it's not a 401 (which is expected when not authenticated)
-      if (error?.message !== 'Unauthorized') {
+      // 401 is expected when not authenticated, so don't log it
+      if (error?.message && error.message !== 'Unauthorized' && !error.message.includes('401')) {
         console.error('Auth check failed:', error);
       }
       apiClient.setToken(null);
