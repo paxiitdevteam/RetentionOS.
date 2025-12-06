@@ -1856,9 +1856,10 @@ router.get('/roi', authenticate, async (req: Request, res: Response) => {
       return;
     }
 
+    // Auto-detect monthly cost from admin account or use provided value
     const monthlyCost = req.query.monthlyCost
       ? parseFloat(req.query.monthlyCost as string)
-      : 99; // Default to Growth plan
+      : undefined; // Will auto-detect if not provided
     const days = req.query.days
       ? parseInt(req.query.days as string)
       : 30;
@@ -1895,9 +1896,10 @@ router.get('/roi/trend', authenticate, async (req: Request, res: Response) => {
       return;
     }
 
+    // Auto-detect monthly cost from admin account or use provided value
     const monthlyCost = req.query.monthlyCost
       ? parseFloat(req.query.monthlyCost as string)
-      : 99;
+      : undefined; // Will auto-detect if not provided
     const days = req.query.days
       ? parseInt(req.query.days as string)
       : 30;
@@ -1934,9 +1936,10 @@ router.get('/roi/forecast', authenticate, async (req: Request, res: Response) =>
       return;
     }
 
+    // Auto-detect monthly cost from admin account or use provided value
     const monthlyCost = req.query.monthlyCost
       ? parseFloat(req.query.monthlyCost as string)
-      : 99;
+      : undefined; // Will auto-detect if not provided
     const forecastDays = req.query.days
       ? parseInt(req.query.days as string)
       : 90;

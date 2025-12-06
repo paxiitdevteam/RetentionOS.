@@ -61,15 +61,30 @@ export interface ROITrendData {
 }
 
 /**
+ * Get default monthly cost based on admin account or default to Growth plan
+ * This should be retrieved from admin account settings or subscription
+ */
+function getDefaultMonthlyCost(): number {
+  // TODO: Get from admin account subscription/plan
+  // For now, default to Growth plan ($99/month)
+  // In production, this should come from:
+  // - AdminAccount.subscriptionPlan
+  // - Or a separate subscription/pricing table
+  return 99; // Growth plan default
+}
+
+/**
  * Calculate comprehensive ROI metrics
- * @param monthlyCost Monthly cost of RetentionOS subscription
+ * @param monthlyCost Monthly cost of RetentionOS subscription (optional, auto-detected if not provided)
  * @param days Number of days to analyze (default: 30)
  * @returns Complete ROI metrics
  */
 export async function calculateROI(
-  monthlyCost: number = 99, // Default to Growth plan
+  monthlyCost?: number, // Auto-detect if not provided
   days: number = 30
 ): Promise<ROIMetrics> {
+  // Auto-detect monthly cost if not provided
+  const actualMonthlyCost = monthlyCost ?? getDefaultMonthlyCost();
   const endDate = new Date();
   const startDate = new Date();
   startDate.setDate(endDate.getDate() - days);
@@ -84,9 +99,9 @@ export async function calculateROI(
   const annualRevenueSaved = dailyRevenueSaved * 365;
 
   // Calculate costs
-  const retentionOSMonthlyCost = monthlyCost;
-  const retentionOSAnnualCost = monthlyCost * 12;
-  const periodCost = (monthlyCost / 30) * days;
+  const retentionOSMonthlyCost = actualMonthlyCost;
+  const retentionOSAnnualCost = actualMonthlyCost * 12;
+  const periodCost = (actualMonthlyCost / 30) * days;
 
   // Calculate ROI
   const monthlyROI = retentionOSMonthlyCost > 0
@@ -113,7 +128,7 @@ export async function calculateROI(
 
   // Calculate break-even
   const breakEvenDays = dailyRevenueSaved > 0
-    ? Math.ceil(retentionOSMonthlyCost / dailyRevenueSaved)
+    ? Math.ceil(actualMonthlyCost / dailyRevenueSaved)
     : Infinity;
 
   const breakEvenDate = breakEvenDays !== Infinity && breakEvenDays < 365
@@ -163,14 +178,15 @@ export async function calculateROI(
 
 /**
  * Get ROI trend over time
- * @param monthlyCost Monthly cost of RetentionOS
+ * @param monthlyCost Monthly cost of RetentionOS (optional, auto-detected if not provided)
  * @param days Number of days to analyze
  * @returns Array of daily ROI data points
  */
 export async function getROITrend(
-  monthlyCost: number = 99,
+  monthlyCost?: number, // Auto-detect if not provided
   days: number = 30
 ): Promise<ROITrendData[]> {
+  const actualMonthlyCost = monthlyCost ?? getDefaultMonthlyCost();
   const endDate = new Date();
   const startDate = new Date();
   startDate.setDate(endDate.getDate() - days);
@@ -237,12 +253,12 @@ export async function getROITrend(
 /**
  * Get revenue impact forecast
  * Projects future revenue saved based on current trends
- * @param monthlyCost Monthly cost of RetentionOS
+ * @param monthlyCost Monthly cost of RetentionOS (optional, auto-detected if not provided)
  * @param forecastDays Number of days to forecast (default: 90)
  * @returns Forecast data
  */
 export async function getRevenueForecast(
-  monthlyCost: number = 99,
+  monthlyCost?: number, // Auto-detect if not provided
   forecastDays: number = 90
 ): Promise<{
   currentMonthlyRevenue: number;
@@ -254,12 +270,13 @@ export async function getRevenueForecast(
   }>;
   forecastConfidence: number; // 0-100
 }> {
-  const roi = await calculateROI(monthlyCost, 30);
+  const actualMonthlyCost = monthlyCost ?? getDefaultMonthlyCost();
+  const roi = await calculateROI(actualMonthlyCost, 30);
   const currentMonthlyRevenue = roi.monthlyRevenueSaved;
 
   // Simple linear projection (can be enhanced with ML later)
   const dailyRevenue = currentMonthlyRevenue / 30;
-  const dailyCost = monthlyCost / 30;
+  const dailyCost = actualMonthlyCost / 30;
 
   const projectedRevenue = [];
   let cumulativeRevenue = 0;

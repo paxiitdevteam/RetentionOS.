@@ -60,8 +60,9 @@ const ROI: NextPage = () => {
   const [forecast, setForecast] = useState<{ currentMonthlyRevenue: number; projectedRevenue: ForecastData[]; forecastConfidence: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [monthlyCost, setMonthlyCost] = useState(99);
+  const [monthlyCost, setMonthlyCost] = useState<number | undefined>(undefined); // Auto-detect by default
   const [days, setDays] = useState(30);
+  const [autoDetectedCost, setAutoDetectedCost] = useState<number | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -80,7 +81,13 @@ const ROI: NextPage = () => {
         apiClient.getRevenueForecast(monthlyCost, 90),
       ]);
 
-      if (metricsRes.success) setMetrics(metricsRes.metrics);
+      if (metricsRes.success) {
+        setMetrics(metricsRes.metrics);
+        // Store auto-detected cost for display
+        if (!monthlyCost && metricsRes.metrics.retentionOSMonthlyCost) {
+          setAutoDetectedCost(metricsRes.metrics.retentionOSMonthlyCost);
+        }
+      }
       if (trendRes.success) setTrendData(trendRes.trend);
       if (forecastRes.success) setForecast(forecastRes.forecast);
     } catch (err: any) {
@@ -137,19 +144,38 @@ const ROI: NextPage = () => {
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <div>
-              <label style={{ fontSize: '12px', color: '#666', marginRight: '8px' }}>Monthly Cost:</label>
+              <label style={{ fontSize: '12px', color: '#666', marginRight: '8px' }}>
+                Monthly Cost {autoDetectedCost && `(Auto: $${autoDetectedCost})`}:
+              </label>
               <input
                 type="number"
-                value={monthlyCost}
-                onChange={(e) => setMonthlyCost(parseFloat(e.target.value) || 99)}
+                value={monthlyCost ?? ''}
+                onChange={(e) => setMonthlyCost(e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder={autoDetectedCost ? `Auto: $${autoDetectedCost}` : 'Auto-detect'}
                 style={{
                   padding: '6px 10px',
                   border: '1px solid #ddd',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  width: '100px',
+                  width: '120px',
                 }}
               />
+              {monthlyCost && (
+                <button
+                  onClick={() => setMonthlyCost(undefined)}
+                  style={{
+                    marginLeft: '8px',
+                    padding: '4px 8px',
+                    fontSize: '12px',
+                    background: '#f0f0f0',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Reset to Auto
+                </button>
+              )}
             </div>
             <div>
               <label style={{ fontSize: '12px', color: '#666', marginRight: '8px' }}>Days:</label>
