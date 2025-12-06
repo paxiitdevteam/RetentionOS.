@@ -7,7 +7,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=mysql://retentionos:password@db:3306/retentionos
+      # ⚠️ SECURITY: Use environment variables from .env file
+      # Create .env file with: DB_USER, DB_PASSWORD, DB_NAME
+      - DATABASE_URL=mysql://${DB_USER:-retentionos}:${DB_PASSWORD}@db:3306/${DB_NAME:-retentionos}
       - REDIS_URL=redis://redis:6379
     depends_on:
       - db
@@ -19,10 +21,12 @@ services:
   db:
     image: mariadb:10.11
     environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_USER=retentionos
-      - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=retentionos
+      # ⚠️ SECURITY: Use environment variables from .env file
+      # Create .env file with: DB_ROOT_PASSWORD, DB_USER, DB_PASSWORD, DB_NAME
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=${DB_USER:-retentionos}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME:-retentionos}
     ports:
       - "3306:3306"
     volumes:

@@ -12,12 +12,27 @@ echo "=========================================="
 echo ""
 
 # Configuration
+# ⚠️ SECURITY: Use environment variables or prompt for passwords
+# Never hardcode passwords in scripts!
 MYSQL_PATH="/c/Program Files/MariaDB 11.8/bin/mysql.exe"
 MYSQLD_PATH="/c/Program Files/MariaDB 11.8/bin/mysqld.exe"
-DB_NAME="retentionos_dev"
-DB_USER="retentionos"
-DB_PASSWORD="password"
-ROOT_PASSWORD="rootpassword"
+DB_NAME="${DB_NAME:-retentionos_dev}"
+DB_USER="${DB_USER:-retentionos}"
+DB_PASSWORD="${DB_PASSWORD:-}"
+ROOT_PASSWORD="${DB_ROOT_PASSWORD:-}"
+
+# Prompt for passwords if not set
+if [ -z "$DB_PASSWORD" ]; then
+    echo "⚠️  DB_PASSWORD not set. Using default 'password' for development only."
+    echo "   Set DB_PASSWORD environment variable for production!"
+    DB_PASSWORD="password"
+fi
+
+if [ -z "$ROOT_PASSWORD" ]; then
+    echo "⚠️  DB_ROOT_PASSWORD not set. Using default 'rootpassword' for development only."
+    echo "   Set DB_ROOT_PASSWORD environment variable for production!"
+    ROOT_PASSWORD="rootpassword"
+fi
 
 # Check if MariaDB exists
 if [ ! -f "$MYSQL_PATH" ]; then

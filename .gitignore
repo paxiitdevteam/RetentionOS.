@@ -11,13 +11,20 @@ build/
 out/
 *.tsbuildinfo
 
-# Environment variables
+# Environment variables - NEVER commit these!
 .env
 .env.local
 .env.production
 .env.development
 .env.test
+.env.*
+!.env.example
 infra/environment/*.env
+!infra/environment/*.env.example
+backend/.env
+frontend/dashboard/.env
+frontend/dashboard/.env.local
+frontend/dashboard/.env.production
 
 # IDE
 .vscode/
@@ -66,12 +73,22 @@ coverage/
 .cache/
 .temp/
 
-# Secrets
+# Secrets and sensitive data
 *.pem
 *.key
 *.cert
+*.p12
+*.pfx
 secrets/
 .secrets/
+config/secrets.*
+**/secrets/**
+**/*secret*
+**/*password*
+**/*token*
+**/*key*
+!**/*.example
+!**/*example*
 
 # Backup files
 *.bak
