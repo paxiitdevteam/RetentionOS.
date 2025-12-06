@@ -56,11 +56,11 @@ export default function Layout({ children }: LayoutProps) {
 
         <nav style={{ flex: 1 }}>
           <NavLink href="/" label="Overview" icon="📊" />
+          <NavLink href="/analytics" label="Analytics" icon="📈" />
           <NavLink href="/roi" label="ROI Calculator" icon="💰" />
           <NavLink href="/subscriptions" label="Subscriptions" icon="💳" />
-          <NavLink href="/analytics" label="Analytics" icon="📈" />
           <NavLink href="/flows" label="Flows" icon="🔄" />
-          <NavLink href="/ai" label="AI Agent Dashboard" icon="🤖" />
+          <NavLink href="/ai" label="AI Agent" icon="🤖" />
           <NavLink href="/settings" label="Settings" icon="⚙️" />
         </nav>
 
@@ -114,13 +114,13 @@ export default function Layout({ children }: LayoutProps) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>
-                {router.pathname === '/' && 'Dashboard Overview'}
-                {router.pathname === '/roi' && 'ROI Calculator'}
-                {router.pathname === '/subscriptions' && 'Subscription Monitoring'}
+                {router.pathname === '/' && 'Overview'}
                 {router.pathname === '/analytics' && 'Analytics'}
+                {router.pathname === '/roi' && 'ROI Calculator'}
+                {router.pathname === '/subscriptions' && 'Subscriptions'}
                 {router.pathname === '/flows' && 'Retention Flows'}
                 {router.pathname === '/flows/builder' && 'Flow Builder'}
-                {router.pathname === '/ai' && 'AI Agent Dashboard'}
+                {router.pathname === '/ai' && 'AI Agent'}
                 {router.pathname === '/settings' && 'Settings'}
               </h2>
             </div>

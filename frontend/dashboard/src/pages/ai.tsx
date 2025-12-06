@@ -137,14 +137,14 @@ const AIPage: NextPage = () => {
   return (
     <Layout>
       <Head>
-        <title>AI Agent Dashboard - RetentionOS</title>
+        <title>AI Agent - RetentionOS</title>
         <meta name="description" content="AI Agent activity, email logs, and performance monitoring" />
       </Head>
 
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#003A78', margin: 0 }}>
-            🤖 AI Agent Dashboard
+            🤖 AI Agent
           </h1>
           <button
             onClick={handleProcessPending}
