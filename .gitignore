@@ -10,6 +10,9 @@ build/
 .next/
 out/
 *.tsbuildinfo
+**/.next/cache/
+**/dist/
+**/build/
 
 # Environment variables - NEVER commit these!
 .env
@@ -21,10 +24,11 @@ out/
 !.env.example
 infra/environment/*.env
 !infra/environment/*.env.example
-backend/.env
-frontend/dashboard/.env
-frontend/dashboard/.env.local
-frontend/dashboard/.env.production
+# Backend env files (now in src-backend/)
+# Dashboard env files (now in dashboard/)
+dashboard/.env
+dashboard/.env.local
+dashboard/.env.production
 
 # IDE
 .vscode/
