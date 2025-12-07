@@ -8,29 +8,41 @@ retentionos/
 ├── README.md
 ├── STRUCTURE.md
 │
-├── backend/
+├── src-backend/              # Backend source code (at root)
+│   ├── api/                  # API route handlers
+│   ├── services/             # Business logic services
+│   ├── db/                   # Database configuration
+│   │   └── index.ts
+│   ├── migrations/           # Database migrations
+│   │   └── 001_initial_schema.sql
+│   ├── models/               # Sequelize/Prisma models
+│   ├── rules/                # Retention flow rules engine
+│   ├── analytics/            # Analytics calculation functions
+│   ├── integrations/          # Third-party integrations (Stripe, etc.)
+│   ├── middleware/           # Express middleware
+│   │   └── auth.ts
+│   └── utils/                # Utility functions
+│
+├── dashboard/                # Dashboard frontend (at root)
 │   ├── package.json
-│   ├── Dockerfile
+│   ├── next.config.js
 │   ├── tsconfig.json
-│   ├── server.ts
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── public/
 │   └── src/
-│       ├── api/              # API route handlers
-│       ├── services/          # Business logic services
-│       ├── db/                # Database configuration
-│       │   └── index.ts
-│       ├── migrations/        # Database migrations
-│       │   └── 001_initial_schema.sql
-│       ├── models/            # Sequelize/Prisma models
-│       ├── rules/             # Retention flow rules engine
-│       ├── analytics/         # Analytics calculation functions
-│       ├── integrations/      # Third-party integrations (Stripe, etc.)
-│       ├── middleware/        # Express middleware
-│       │   └── auth.ts
-│       └── utils/             # Utility functions
-│   └── tests/                # Test files
+│       ├── pages/
+│       │   ├── _app.tsx
+│       │   └── index.tsx
+│       ├── components/
+│       ├── hooks/
+│       ├── context/
+│       ├── services/
+│       └── styles/
+│           └── globals.css
 │
 ├── frontend/
-│   ├── dashboard/
+│   ├── marketing-html/       # Marketing website
 │   │   ├── package.json
 │   │   ├── next.config.js
 │   │   ├── tsconfig.json
@@ -76,13 +88,13 @@ retentionos/
 
 ## Configuration Files Created
 
-### Backend
-- ✅ `package.json` - Node.js dependencies and scripts
-- ✅ `Dockerfile` - Docker container configuration
-- ✅ `tsconfig.json` - TypeScript configuration
-- ✅ `server.ts` - Express server entry point
+### Backend (src-backend/)
+- ✅ `package-backend.json` - Backend dependencies (at root)
+- ✅ `tsconfig-backend.json` - TypeScript configuration (at root)
+- ✅ `Dockerfile-backend` - Docker container configuration (at root)
+- ✅ `src-backend/server.ts` - Express server entry point
 
-### Frontend Dashboard
+### Frontend Dashboard (dashboard/)
 - ✅ `package.json` - Next.js dependencies
 - ✅ `next.config.js` - Next.js configuration
 - ✅ `tsconfig.json` - TypeScript configuration
