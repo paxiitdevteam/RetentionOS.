@@ -23,8 +23,19 @@ export const runMigrations = async (): Promise<void> => {
 
     for (const migrationFile of migrationFiles) {
       console.log(`📄 Running migration: ${migrationFile}`);
-      const migrationPath = join(__dirname, '../migrations', migrationFile);
-      const migrationSQL = readFileSync(migrationPath, 'utf-8');
+      // Support both:
+      // - running from TS directly (src-backend/db/migrate.ts)
+      // - running compiled JS (dist-backend/db/migrate.js)
+      const srcMigrationPath = join(process.cwd(), 'src-backend', 'migrations', migrationFile);
+      const localMigrationPath = join(__dirname, '../migrations', migrationFile);
+
+      const migrationSQL = (() => {
+        try {
+          return readFileSync(localMigrationPath, 'utf-8');
+        } catch {
+          return readFileSync(srcMigrationPath, 'utf-8');
+        }
+      })();
 
       // Split by semicolons and execute each statement
       // For prepared statements, we need to handle them differently
