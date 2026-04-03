@@ -16,7 +16,7 @@ class ComponentLoader {
         if (this.headerLoaded) return;
         
         try {
-            const response = await fetch('components/header.html');
+            const response = await fetch(new URL('components/header.html', window.location.href));
             if (!response.ok) throw new Error('Failed to load header');
             
             const html = await response.text();
@@ -39,7 +39,7 @@ class ComponentLoader {
         if (this.footerLoaded) return;
         
         try {
-            const response = await fetch('components/footer.html');
+            const response = await fetch(new URL('components/footer.html', window.location.href));
             if (!response.ok) throw new Error('Failed to load footer');
             
             const html = await response.text();

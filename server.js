@@ -18,7 +18,18 @@ app.use(express.json());
 
 // Public marketing landing (static site in frontend/marketing-html)
 const marketingDir = path.join(__dirname, 'frontend', 'marketing-html');
-app.use(express.static(marketingDir));
+
+// Explicit home route so `/` always serves the landing (reliable on all platforms)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(marketingDir, 'index.html'));
+});
+
+app.use(
+  express.static(marketingDir, {
+    index: 'index.html',
+    extensions: ['html'],
+  })
+);
 
 // Internal dev status dashboard (was previously at /)
 app.get('/project-status', (req, res) => {

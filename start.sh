@@ -13,8 +13,9 @@ if [ ! -d "node_modules" ]; then
 fi
 
 # Start root server
-echo "🌐 Starting server on port 8000..."
-echo "📊 Status page will be available at: http://localhost:8000/"
+echo "🌐 Starting root server on port 8000..."
+echo "🌐 Marketing landing: http://localhost:8000/"
+echo "📊 Project status (dev): http://localhost:8000/project-status"
 echo ""
 npm start
 
