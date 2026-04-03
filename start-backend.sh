@@ -1,17 +1,11 @@
 #!/bin/bash
-# Start Backend Server from Root
-# Usage: ./start-backend.sh
+# Wrapper (kept for compatibility).
+# Main entrypoint is `./start.sh backend`.
 
-echo "🚀 Starting RetentionOS Backend Server..."
-echo "📍 Location: Root directory"
-echo ""
+set -e
 
-# Check if node_modules exists, if not install
-if [ ! -d "node_modules" ]; then
-  echo "📦 Installing dependencies..."
-  npm install
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
-# Start backend server
-npm run backend:dev
+exec ./start.sh backend
 

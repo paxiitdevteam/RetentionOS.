@@ -1,17 +1,11 @@
 #!/bin/bash
-# Start Dashboard Server from Root
-# Usage: ./start-dashboard.sh
+# Wrapper (kept for compatibility).
+# Main entrypoint is `./start.sh dashboard`.
 
-echo "🚀 Starting RetentionOS Dashboard..."
-echo "📍 Location: Root directory"
-echo ""
+set -e
 
-# Check if dashboard/node_modules exists, if not install
-if [ ! -d "dashboard/node_modules" ]; then
-  echo "📦 Installing dashboard dependencies..."
-  cd dashboard && npm install && cd ..
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
-# Start dashboard server
-npm run dashboard:dev
+exec ./start.sh dashboard
 
