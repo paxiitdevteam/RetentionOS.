@@ -19,9 +19,11 @@ if (!stripeSecretKey) {
   console.warn('⚠️  STRIPE_SECRET_KEY not set. Stripe integration will not work.');
 }
 
-const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
-  apiVersion: '2024-11-20.acacia',
-}) : null;
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, {
+      apiVersion: '2025-11-17.clover',
+    })
+  : null;
 
 /**
  * Handle subscription updated webhook event
@@ -35,7 +37,10 @@ export async function handleSubscriptionUpdated(
     throw new Error('Stripe client not initialized');
   }
 
-  const subscription = event.data.object as Stripe.Subscription;
+  const subscription = event.data.object as Stripe.Subscription & {
+    current_period_end?: number;
+    current_period_start?: number;
+  };
 
   try {
     // Find or create user by customer ID
@@ -166,7 +171,8 @@ export async function handleInvoicePaid(
   }
 
   const invoice = event.data.object as Stripe.Invoice;
-  const subscriptionId = invoice.subscription as string;
+  const subscriptionId = (invoice as Stripe.Invoice & { subscription?: string | null })
+    .subscription as string;
 
   if (!subscriptionId) {
     // One-time payment, not a subscription
@@ -241,7 +247,8 @@ export async function handleTrialEnding(
  */
 export async function processWebhookEvent(event: Stripe.Event): Promise<void> {
   try {
-    switch (event.type) {
+    const eventType = event.type as string;
+    switch (eventType) {
       case 'customer.subscription.updated':
         await handleSubscriptionUpdated(event);
         break;

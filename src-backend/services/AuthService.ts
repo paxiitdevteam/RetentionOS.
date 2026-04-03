@@ -5,7 +5,7 @@
  */
 
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import AdminAccount, { AdminRole } from '../models/AdminAccount';
 import AuditLog from '../models/AuditLog';
 
@@ -141,9 +141,10 @@ export async function generateJwt(adminId: number): Promise<string> {
   };
 
   // Generate token with expiration
-  const token = jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
+  const signOpts: SignOptions = {
+    expiresIn: JWT_EXPIRES_IN as SignOptions['expiresIn'],
+  };
+  const token = jwt.sign(payload, JWT_SECRET as Secret, signOpts);
 
   return token;
 }

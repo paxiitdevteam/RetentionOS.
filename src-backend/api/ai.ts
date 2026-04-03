@@ -13,7 +13,7 @@ import {
   getAIPerformanceMetrics,
   initializeAIWeights,
 } from '../services/AIService';
-import { OfferEvent } from '../models/OfferEvent';
+import OfferEvent from '../models/OfferEvent';
 import AIWeight from '../models/AIWeight';
 
 const router = Router();

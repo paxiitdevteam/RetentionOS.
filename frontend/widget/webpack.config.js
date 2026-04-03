@@ -15,19 +15,8 @@ module.exports = {
     minimize: true,
     usedExports: true,
     sideEffects: false,
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        default: false,
-        vendors: false,
-        // Bundle everything into a single file for widget
-        bundle: {
-          name: 'retentionos-widget',
-          chunks: 'all',
-          enforce: true,
-        },
-      },
-    },
+    // Single UMD bundle — splitChunks would emit duplicate filenames
+    splitChunks: false,
   },
   module: {
     rules: [

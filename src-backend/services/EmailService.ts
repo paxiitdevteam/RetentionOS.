@@ -50,7 +50,7 @@ function getTransporter(): nodemailer.Transporter {
   // If no SMTP config, use test account (for development)
   if (!smtpConfig.auth.user || !smtpConfig.auth.pass) {
     console.warn('⚠️  No SMTP credentials found. Using test account. Emails will not be sent in production.');
-    transporter = nodemailer.createTransporter({
+    transporter = nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
       auth: {
@@ -59,7 +59,7 @@ function getTransporter(): nodemailer.Transporter {
       },
     });
   } else {
-    transporter = nodemailer.createTransporter(smtpConfig);
+    transporter = nodemailer.createTransport(smtpConfig);
   }
 
   return transporter;

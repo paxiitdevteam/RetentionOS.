@@ -22,11 +22,11 @@ const widgetRateLimit = rateLimit({
   message: 'Too many requests from this API key, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
+  keyGenerator: (req: Request) => {
     // Use API key as the rate limit key
     return req.apiKey?.id?.toString() || req.ip || 'unknown';
   },
-  skip: (req) => {
+  skip: (req: Request) => {
     // Skip rate limiting if no API key (will be caught by auth middleware)
     return !req.apiKey;
   },

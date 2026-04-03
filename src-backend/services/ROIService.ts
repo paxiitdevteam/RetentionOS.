@@ -117,7 +117,7 @@ export async function calculateROI(
     : 0;
 
   // Calculate efficiency metrics
-  const totalCustomersSaved = summary.totalSavedUsers || 0;
+  const totalCustomersSaved = summary.totalUsersSaved || 0;
   const costPerSavedCustomer = totalCustomersSaved > 0
     ? periodCost / totalCustomersSaved
     : 0;
@@ -208,7 +208,7 @@ export async function getROITrend(
     raw: true,
   });
 
-  const dailyCost = monthlyCost / 30;
+  const dailyCost = actualMonthlyCost / 30;
   let cumulativeRevenue = 0;
   let cumulativeCost = 0;
 
@@ -226,7 +226,9 @@ export async function getROITrend(
       return eventDate === dateStr;
     });
 
-    const dayRevenue = dayEvent ? parseFloat(dayEvent.revenue as string) || 0 : 0;
+    const dayRevenue = dayEvent
+      ? parseFloat(String((dayEvent as unknown as { revenue?: unknown }).revenue ?? 0)) || 0
+      : 0;
     cumulativeRevenue += dayRevenue;
     cumulativeCost += dailyCost;
 

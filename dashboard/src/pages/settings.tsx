@@ -9,6 +9,7 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
+import Modal, { FormField, ModalActions, ModalButton } from '../components/Modal';
 
 interface ApiKey {
   id: number;

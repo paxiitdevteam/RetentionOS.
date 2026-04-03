@@ -67,7 +67,7 @@ export async function startRetentionFlow(
     subscription = await createOrUpdateSubscription(
       user.id,
       stripeSubscriptionId || null,
-      subscriptionValue || null,
+      subscriptionValue ?? undefined,
       'active'
     );
   } else {

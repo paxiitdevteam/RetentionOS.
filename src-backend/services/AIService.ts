@@ -207,9 +207,6 @@ export async function recommendBestOffer(userId: number, flowId?: number): Promi
   } else if (segment === 'low_value') {
     recommendedOffer = 'downgrade';
     reason = 'Low-value users prefer downgrade options';
-  } else if (segment === 'frequent_canceler') {
-    recommendedOffer = 'pause';
-    reason = 'Frequent cancelers prefer pause options';
   } else {
     recommendedOffer = 'pause';
     reason = 'Default recommendation for this segment';
@@ -319,15 +316,19 @@ export async function updateModelWithEvent(event: OfferEvent): Promise<void> {
     }
   }
 
+  if (!event.offerType) {
+    return;
+  }
+
   // Update offer performance
   const [offerPerf, created] = await OfferPerformance.findOrCreate({
     where: {
       offerType: event.offerType,
-      segment: segment,
+      segment: segment ?? 'unknown',
     },
     defaults: {
       offerType: event.offerType,
-      segment: segment,
+      segment: segment ?? 'unknown',
       totalShown: 0,
       totalAccepted: 0,
       acceptanceRate: 0,

@@ -256,7 +256,7 @@ export async function triggerProactiveRetention(
 
       // Start retention flow proactively
       const flowResult = await startRetentionFlow(
-        user.externalId,
+        user.externalId ?? String(user.id),
         user.plan || 'unknown',
         user.region || 'unknown',
         user.email || undefined,

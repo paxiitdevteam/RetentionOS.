@@ -96,7 +96,7 @@ Alert.init(
         return value ? (typeof value === 'string' ? JSON.parse(value) : value) : null;
       },
       set(value: any) {
-        this.setDataValue('metadata', value ? JSON.stringify(value) : null);
+        this.setDataValue('metadata', (value ? JSON.stringify(value) : null) as any);
       },
     },
     emailSent: {

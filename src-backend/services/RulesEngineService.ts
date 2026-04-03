@@ -226,7 +226,7 @@ export async function getBestFlowForUser(userId: number): Promise<{
   const segment = await segmentUser(user, subscription);
 
   // Match flow to segment
-  const flow = await matchFlowToSegment(segment, user.language || 'en');
+  const flow = await matchFlowToSegment(segment, 'en');
 
   // Get offer rankings
   const userContext: UserContext = {
@@ -254,7 +254,10 @@ export async function getBestFlowForUser(userId: number): Promise<{
     ? offerTypes
     : ['pause', 'downgrade', 'discount', 'support'];
 
-  const offerRankings = await rankOffersByBaseRules(offers, userContext);
+  const offerRankings = await rankOffersByBaseRules(
+    offers as Array<'pause' | 'downgrade' | 'discount' | 'support'>,
+    userContext
+  );
 
   return {
     flow,

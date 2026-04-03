@@ -21,32 +21,31 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
       
-      # Build Backend
+      # Build Backend (root package.json + src-backend → dist-backend)
       - name: Build Backend
-        working-directory: ./backend
         run: |
-          npm ci
-          npm run build
+          npm install
+          npm run backend:build
       
       # Build Dashboard
       - name: Build Dashboard
-        working-directory: ./frontend/dashboard
+        working-directory: ./dashboard
         run: |
-          npm ci
+          npm install
           npm run build
       
       # Build Widget
       - name: Build Widget
         working-directory: ./frontend/widget
         run: |
-          npm ci
+          npm install
           npm run build
       
       - name: Create deployment package
         run: |
           mkdir -p deployment
-          cp -r backend/dist deployment/backend
-          cp -r frontend/dashboard/.next deployment/dashboard
+          cp -r dist-backend deployment/backend
+          cp -r dashboard/.next deployment/dashboard
           cp -r frontend/widget/build deployment/widget
           cp -r infra deployment/infra
           cp -r docs deployment/docs

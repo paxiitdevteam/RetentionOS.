@@ -4,7 +4,7 @@
  * Per backend-services.md specification
  */
 
-import { OfferEvent } from '../models/OfferEvent';
+import OfferEvent from '../models/OfferEvent';
 import ChurnReason from '../models/ChurnReason';
 import { updateModelWithEvent } from './AIService';
 
@@ -88,11 +88,10 @@ export async function logChurnReason(
   userId: number,
   reasonCode: string,
   reasonText?: string,
-  flowId?: number
+  _flowId?: number
 ): Promise<ChurnReason> {
   return await ChurnReason.create({
     userId,
-    flowId: flowId || null,
     reasonCode,
     reasonText: reasonText || null,
   });

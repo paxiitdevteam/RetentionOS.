@@ -6,7 +6,9 @@
 
 import { Op } from 'sequelize';
 import Flow from '../models/Flow';
-import { OfferEvent } from '../models/OfferEvent';
+import OfferEvent from '../models/OfferEvent';
+import Subscription from '../models/Subscription';
+import User from '../models/User';
 
 export interface FlowStep {
   type: 'pause' | 'downgrade' | 'discount' | 'support' | 'feedback';

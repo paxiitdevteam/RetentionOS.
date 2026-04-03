@@ -6,7 +6,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../db';
 
-interface FlowAttributes {
+export interface FlowAttributes {
   id: number;
   name: string;
   steps: object; // JSONB

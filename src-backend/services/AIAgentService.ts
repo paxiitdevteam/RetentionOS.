@@ -331,7 +331,7 @@ async function executeAction(action: AIAgentAction, context: AIAgentContext): Pr
       const user = await User.findByPk(context.userId);
       if (user) {
         await startRetentionFlow(
-          user.externalId,
+          user.externalId ?? String(user.id),
           user.plan || 'unknown',
           user.region || 'unknown',
           user.email || undefined

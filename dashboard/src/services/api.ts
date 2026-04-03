@@ -50,14 +50,16 @@ class ApiClient {
     // Otherwise, prepend baseUrl for relative paths
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
     
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
     };
+    if (options.headers && typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+      Object.assign(headers, options.headers as Record<string, string>);
+    }
 
     // Add auth token if available
     if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+      headers.Authorization = `Bearer ${this.token}`;
     }
 
     const response = await fetch(url, {
@@ -503,6 +505,35 @@ class ApiClient {
     }
 
     return Array.from(templateMap.values());
+  }
+
+  private async loadFromGoogleSheets(
+    _url: string,
+    _apiKey?: string
+  ): Promise<{ success: boolean; templates: any[] }> {
+    throw new Error('Google Sheets import is not wired yet. Use CSV, JSON, or database templates.');
+  }
+
+  private async parseJSONFile(file: File): Promise<{ success: boolean; templates: any[] }> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const text = e.target?.result as string;
+          const data = JSON.parse(text);
+          const templates = Array.isArray(data) ? data : data.templates ?? [];
+          resolve({ success: true, templates });
+        } catch (err: unknown) {
+          reject(new Error(err instanceof Error ? err.message : 'Invalid JSON'));
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsText(file);
+    });
+  }
+
+  private async parseXMLFile(_file: File): Promise<{ success: boolean; templates: any[] }> {
+    throw new Error('XML template import is not implemented yet.');
   }
 
   async getFlowTemplatesFromSource() {

@@ -10,6 +10,7 @@ import {
   getSubscriptionStats,
 } from '../services/SubscriptionMonitorService';
 import { getAlertStats } from '../services/AlertService';
+import { processPendingAlertsWithAI } from '../services/AIAgentService';
 
 /**
  * Run daily subscription monitoring

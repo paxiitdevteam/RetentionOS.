@@ -5,7 +5,6 @@
  */
 
 import { ReactNode } from 'react';
-import './Modal.css';
 
 // Add global styles for modal animations
 if (typeof document !== 'undefined') {
