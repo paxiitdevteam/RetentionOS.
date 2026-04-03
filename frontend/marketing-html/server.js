@@ -1,6 +1,6 @@
 /**
- * Simple HTTP Server for Marketing Website
- * Serves HTML files on port 3003
+ * Optional standalone static server (default port 3002).
+ * Prefer the repo root: `npm start` → http://localhost:8000/ (serves this folder + /project-status).
  */
 
 const http = require('http');
