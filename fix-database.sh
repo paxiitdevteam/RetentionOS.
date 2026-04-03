@@ -1,8 +1,12 @@
 #!/bin/bash
-# Automated MariaDB Authentication Fix
-# IMPORTANT: Run Git Bash as Administrator first!
-# Right-click Git Bash → Run as administrator
-# Then run: bash backend/fix-database.sh
+# Automated MariaDB / MySQL authentication fix (Windows, Git Bash)
+# Resets app user to mysql_native_password so Node mysql2 can connect.
+#
+# IMPORTANT: Run Git Bash as Administrator (required for net stop / net start).
+# From repo root:
+#   bash fix-database.sh
+#
+# Optional env vars: MYSQL_PATH, MYSQLD_PATH, DB_NAME, DB_USER, DB_PASSWORD, DB_ROOT_PASSWORD
 
 set -e  # Exit on error
 
@@ -11,11 +15,35 @@ echo "Automated MariaDB Authentication Fix"
 echo "=========================================="
 echo ""
 
-# Configuration
-# ⚠️ SECURITY: Use environment variables or prompt for passwords
-# Never hardcode passwords in scripts!
-MYSQL_PATH="/c/Program Files/MariaDB 11.8/bin/mysql.exe"
-MYSQLD_PATH="/c/Program Files/MariaDB 11.8/bin/mysqld.exe"
+# Configuration — discover mysql.exe / mysqld.exe unless MYSQL_PATH / MYSQLD_PATH set
+# ⚠️ Set passwords via env in production; defaults below are dev-only.
+
+detect_binary() {
+  local name="$1"
+  local candidates=(
+    "/c/Program Files/MariaDB 11.8/bin/${name}"
+    "/c/Program Files/MariaDB 11.4/bin/${name}"
+    "/c/Program Files/MariaDB 10.11/bin/${name}"
+    "/c/Program Files/MariaDB 10.6/bin/${name}"
+    "/c/Program Files/MySQL/MySQL Server 8.4/bin/${name}"
+    "/c/Program Files/MySQL/MySQL Server 8.0/bin/${name}"
+  )
+  local c
+  for c in "${candidates[@]}"; do
+    if [ -f "$c" ]; then
+      echo "$c"
+      return 0
+    fi
+  done
+  return 1
+}
+
+if [ -z "${MYSQL_PATH:-}" ]; then
+  MYSQL_PATH="$(detect_binary mysql.exe)" || true
+fi
+if [ -z "${MYSQLD_PATH:-}" ]; then
+  MYSQLD_PATH="$(detect_binary mysqld.exe)" || true
+fi
 DB_NAME="${DB_NAME:-retentionos_dev}"
 DB_USER="${DB_USER:-retentionos}"
 DB_PASSWORD="${DB_PASSWORD:-}"
@@ -34,14 +62,18 @@ if [ -z "$ROOT_PASSWORD" ]; then
     ROOT_PASSWORD="rootpassword"
 fi
 
-# Check if MariaDB exists
-if [ ! -f "$MYSQL_PATH" ]; then
-    echo "❌ MariaDB not found at expected location"
-    echo "   Expected: $MYSQL_PATH"
+# Check if client/server exists
+if [ -z "$MYSQL_PATH" ] || [ ! -f "$MYSQL_PATH" ]; then
+    echo "❌ mysql.exe not found. Install MariaDB or MySQL, or set MYSQL_PATH to mysql.exe"
+    exit 1
+fi
+if [ -z "$MYSQLD_PATH" ] || [ ! -f "$MYSQLD_PATH" ]; then
+    echo "❌ mysqld.exe not found. Install MariaDB or MySQL, or set MYSQLD_PATH to mysqld.exe"
     exit 1
 fi
 
-echo "✅ Found MariaDB at: $MYSQL_PATH"
+echo "✅ Using mysql:  $MYSQL_PATH"
+echo "✅ Using mysqld: $MYSQLD_PATH"
 echo ""
 
 # Step 1: Stop MariaDB service
@@ -54,14 +86,19 @@ echo ""
 echo "Step 2: Starting MariaDB in safe mode..."
 echo "   This will run in the background..."
 
-# Find data directory
-DATA_DIR="C:/ProgramData/MariaDB 11.8/Data"
-if [ ! -d "$DATA_DIR" ]; then
-    DATA_DIR="C:/ProgramData/MySQL/MySQL Server 8.0/Data"
-fi
-if [ ! -d "$DATA_DIR" ]; then
-    DATA_DIR=""
-fi
+# Find data directory (first match)
+DATA_DIR=""
+for d in \
+  "C:/ProgramData/MariaDB 11.8/Data" \
+  "C:/ProgramData/MariaDB 11.4/Data" \
+  "C:/ProgramData/MariaDB 10.11/Data" \
+  "C:/ProgramData/MySQL/MySQL Server 8.4/Data" \
+  "C:/ProgramData/MySQL/MySQL Server 8.0/Data"; do
+  if [ -d "$d" ]; then
+    DATA_DIR="$d"
+    break
+  fi
+done
 
 # Start mysqld in safe mode (background) - use socket for connection
 SOCKET_FILE="/tmp/mysql_safe_$$.sock"
@@ -192,10 +229,11 @@ echo "=========================================="
 echo "✅ FIX COMPLETE!"
 echo "=========================================="
 echo ""
-echo "Next steps:"
-echo "  1. cd backend"
-echo "  2. npm run test:db"
-echo "  3. npm run seed"
-echo "  4. Test login at http://localhost:3001/login"
+echo "Next steps (repo root — this project has no backend/ subfolder):"
+echo "  1. Copy .env.example to .env and set DB_PASSWORD to match (default after script: password)"
+echo "  2. npm run db:migrate"
+echo "  3. npm run db:seed"
+echo "  4. npm run backend:dev   # API :3000"
+echo "  5. npm run dashboard:dev  # UI :3001 — login at /login"
 echo ""
 

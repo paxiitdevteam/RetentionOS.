@@ -79,6 +79,12 @@ grep -r "api.*key.*=" --include="*.js" --include="*.ts" .
 grep -r "secret.*=" --include="*.js" --include="*.ts" .
 ```
 
+## GitHub and CI (deploy without NAS)
+
+- Commit **only** template files (for example **`.env.example`**, `infra/environment/*.env.example`). **Never** commit real **`.env`** files or production dumps.
+- In **GitHub Actions**, store secrets in **Repository secrets** (`Settings → Secrets and variables → Actions`) and pass them into the workflow `env:` block, or write a temporary `.env` during the job step. Do not echo secrets in logs.
+- Production servers should receive `.env` via your host’s secret manager or SSH, not from the Git repo.
+
 ## Docker Compose Security
 
 When using Docker Compose:
