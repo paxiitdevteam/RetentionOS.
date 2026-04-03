@@ -7,10 +7,8 @@ const PMS = {
     // Base URLs
     baseUrl: window.location.origin,
     
-    // Dashboard URL
+    // Defaults for local dev; override with <meta name="retentionos-dashboard-url"> / retentionos-api-url>
     dashboardUrl: 'http://localhost:3001',
-    
-    // API URL
     apiUrl: 'http://localhost:3000',
     
     // Marketing pages paths
@@ -56,15 +54,19 @@ const PMS = {
                window.location.hostname !== '127.0.0.1';
     },
     
-    // Initialize - update URLs based on environment
+    // Initialize — optional <meta name="retentionos-dashboard-url" content="https://..."> (and api-url)
     init: function() {
-        if (this.isProduction()) {
-            // In production, use relative paths or configured domain
-            this.dashboardUrl = 'https://dashboard.retentionos.com';
-            this.apiUrl = 'https://api.retentionos.com';
-        }
-        
-        // Make PMS available globally
+        try {
+            var dm = document.querySelector('meta[name="retentionos-dashboard-url"]');
+            var am = document.querySelector('meta[name="retentionos-api-url"]');
+            if (dm && dm.getAttribute('content') && dm.getAttribute('content').trim()) {
+                this.dashboardUrl = dm.getAttribute('content').trim().replace(/\/$/, '');
+            }
+            if (am && am.getAttribute('content') && am.getAttribute('content').trim()) {
+                this.apiUrl = am.getAttribute('content').trim().replace(/\/$/, '');
+            }
+        } catch (e) { /* SSR-safe */ }
+
         window.PMS = this;
     }
 };

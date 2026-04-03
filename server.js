@@ -1,7 +1,8 @@
 /**
- * RetentionOS Root Server
- * Serves status page and provides API proxy
- * Runs at root level for easy access
+ * RetentionOS Root Server (port 8000)
+ * - Serves the public marketing landing from frontend/marketing-html/
+ * - /project-status = internal dev status HTML
+ * - /api/status proxies the backend JSON status
  */
 
 const express = require('express');
@@ -14,10 +15,13 @@ const PORT = process.env.PORT || 8000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
 
-// Serve status page at root
-app.get('/', (req, res) => {
+// Public marketing landing (static site in frontend/marketing-html)
+const marketingDir = path.join(__dirname, 'frontend', 'marketing-html');
+app.use(express.static(marketingDir));
+
+// Internal dev status dashboard (was previously at /)
+app.get('/project-status', (req, res) => {
   res.sendFile(path.join(__dirname, 'status.html'));
 });
 
@@ -86,8 +90,8 @@ app.get('/api/status', async (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log('🚀 RetentionOS Root Server running');
-  console.log(`📊 Status page: http://localhost:${PORT}/`);
-  console.log(`📄 Direct file: http://localhost:${PORT}/status.html`);
+  console.log(`🌐 Marketing landing: http://localhost:${PORT}/`);
+  console.log(`📊 Project status (dev): http://localhost:${PORT}/project-status`);
   console.log(`💚 Health check: http://localhost:${PORT}/health`);
   console.log('');
   console.log('To start backend API:');

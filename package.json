@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "backend:dev": "cd . && npm --prefix . run backend:dev:internal",
-    "backend:dev:internal": "ts-node-dev --respawn --transpile-only src-backend/server.ts",
+    "backend:dev:internal": "ts-node-dev --respawn --transpile-only --project tsconfig-backend.json src-backend/server.ts",
     "backend:build": "cd . && npm --prefix . run backend:build:internal",
     "backend:build:internal": "tsc -p tsconfig-backend.json",
     "backend:start": "node dist-backend/server.js",

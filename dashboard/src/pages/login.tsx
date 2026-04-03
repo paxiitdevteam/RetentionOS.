@@ -124,7 +124,7 @@ const Login: NextPage = () => {
                   <br />
                   The database needs to be configured before you can log in.
                   <br />
-                  See <code>FIX_DATABASE_NOW.txt</code> in the project root for instructions.
+                  See <code>QUICK_SETUP.md</code> and <code>fix-database.sh</code> in the project root for database setup.
                 </div>
               )}
             </div>

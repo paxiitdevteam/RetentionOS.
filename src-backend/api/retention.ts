@@ -23,8 +23,8 @@ const widgetRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req: Request) => {
-    // Use API key as the rate limit key
-    return req.apiKey?.id?.toString() || req.ip || 'unknown';
+    // API key id only (avoid req.ip without express-rate-limit IPv6 helper)
+    return req.apiKey ? String(req.apiKey.id) : 'unauthenticated';
   },
   skip: (req: Request) => {
     // Skip rate limiting if no API key (will be caught by auth middleware)
